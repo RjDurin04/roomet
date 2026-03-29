@@ -1,0 +1,30 @@
+# Pipeline Enforcement — pre-commit hooks
+# Replaces: security/ban-hardcoded-secrets.md, testing/enforce-coverage-threshold.md, testing/enforce-test-isolation.md (indirectly)
+# These run BEFORE code enters the repo — the AI cannot bypass them.
+
+pre-commit:
+  parallel: true
+  commands:
+    # ── Replaces: security/ban-hardcoded-secrets ──
+    secrets:
+      run: npx gitleaks detect --source . --verbose
+      fail_text: "❌ Hardcoded secrets detected. Remove them before committing."
+
+    # ── Replaces: code-quality rules (all in eslint.config.js) ──
+    lint:
+      glob: "*.{ts,tsx}"
+      run: npx eslint {staged_files} --max-warnings 0
+      fail_text: "❌ ESLint violations found. Fix before committing."
+
+    # ── Replaces: enforce-type-safety + enforce-null-safety ──
+    typecheck:
+      run: npx tsc --noEmit
+      fail_text: "❌ TypeScript errors found. Fix before committing."
+
+# pre-push hooks disabled until tests are implemented
+# pre-push:
+#   commands:
+#     # ── Replaces: testing/enforce-coverage-threshold ──
+#     test:
+#       run: npx vitest run --coverage
+#       fail_text: "❌ Tests failed or coverage below threshold."
