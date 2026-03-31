@@ -1,5 +1,5 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-floating-promises, @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-misused-promises */
 
 import { useQuery, useMutation } from 'convex/react';
 import { Loader2, Building2, RotateCcw, ArrowLeft, Info } from 'lucide-react';

@@ -51,18 +51,16 @@ export function OwnerReviews() {
   
   const or = useOwnerReviews(targetId);
 
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(targetId ?? null);
   const [page, setPage] = useState(1);
   const replyInputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Reset page when filter changes
-  useEffect(() => { setPage(1); }, [or.filter]);
+  const handleFilterChange = (f: 'all' | 'pending' | 'replied') => {
+    or.setFilter(f);
+    setPage(1);
+  };
 
-  // Auto-expand targeted review
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Purposeful effect to update view state based on target ID change
-    if (targetId) setExpandedId(targetId);
-  }, [targetId]);
+
 
   // Auto-focus reply textarea
   useEffect(() => {
@@ -132,7 +130,7 @@ export function OwnerReviews() {
               {(['all', 'pending', 'replied'] as const).map((f) => (
                 <button
                   key={f}
-                  onClick={() => or.setFilter(f)}
+                  onClick={() => handleFilterChange(f)}
                   className={`px-3 md:px-4 py-1.5 rounded-lg text-[10px] md:text-[11px] font-bold capitalize transition-all whitespace-nowrap ${
                     or.filter === f
                       ? 'bg-background text-foreground shadow-sm ring-1 ring-border/50'

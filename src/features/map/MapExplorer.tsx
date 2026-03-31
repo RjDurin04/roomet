@@ -21,7 +21,7 @@ const CLICK_ZOOM = 16;
 const BOUNDS_POLLING_MS = 300;
 const CACHE_KEY = 'roomet_last_location';
 
-// eslint-disable-next-line max-lines-per-function, complexity -- MapExplorer integrates location strategy, caching, map bounds, and filtering
+// eslint-disable-next-line max-lines-per-function -- MapExplorer integrates location strategy, caching, map bounds, and filtering
 export function MapExplorer() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -85,14 +85,22 @@ export function MapExplorer() {
       navigator.geolocation.getCurrentPosition((position) => {
         handleLocationResult(position.coords.longitude, position.coords.latitude, SEARCH_ZOOM);
       }, (error) => {
-        console.warn("[MapExplorer] Geolocation denied/failed, using fallback:", error);
+        // Only warn for real errors; don't spam for handled fallbacks
+        if (error.code !== error.TIMEOUT) {
+          console.warn("[MapExplorer] Geolocation failed:", error.message);
+        }
+        
         // Fallback to Cebu if no cached location, otherwise keep cached
         if (!localStorage.getItem(CACHE_KEY)) {
            handleLocationResult(UI_CONSTANTS.CEBU_CENTER.lng, UI_CONSTANTS.CEBU_CENTER.lat, INITIAL_ZOOM);
         } else {
            setIsLocating(false);
         }
-      }, { enableHighAccuracy: true, timeout: 5000 });
+      }, { 
+        enableHighAccuracy: true, 
+        timeout: 10000,
+        maximumAge: 60000 
+      });
     } else {
       setIsLocating(false);
     }
@@ -164,26 +172,38 @@ export function MapExplorer() {
   )).filter(Boolean).sort();
 
   const houses: ExplorerHouse[] = properties.map(p => {
-    const minPrice = p.rooms.length > 0 ? Math.min(...p.rooms.map((r: { price: number }) => r.price)) : 0;
-    const isAvailable = p.rooms.some((r: { occupied?: number; capacity: number }) => (r.occupied ?? 0) < r.capacity);
-    const centerLng = viewport.center[0];
-    const centerLat = viewport.center[1];
-    const distance = getDistance(centerLat, centerLng, p.location.lat, p.location.lng);
+    // DEF-008: Protective mapping against null/NaN values
+    const safeRooms = p.rooms || [];
+    const minPrice = safeRooms.length > 0 
+      ? Math.min(...safeRooms.map((r: { price: number }) => typeof r.price === 'number' ? r.price : 0)) 
+      : 0;
+    
+    const isAvailable = safeRooms.some((r: { occupied?: number; capacity: number }) => 
+      (typeof r.occupied === 'number' ? r.occupied : 0) < (typeof r.capacity === 'number' ? r.capacity : 1)
+    );
+    
+    const centerLng = typeof viewport.center[0] === 'number' ? viewport.center[0] : 123.891;
+    const centerLat = typeof viewport.center[1] === 'number' ? viewport.center[1] : 10.3157;
+    
+    const propLng = typeof p.location.lng === 'number' ? p.location.lng : 0;
+    const propLat = typeof p.location.lat === 'number' ? p.location.lat : 0;
+    
+    const distance = getDistance(centerLat, centerLng, propLat, propLng);
     
     return {
       id: p._id,
-      name: p.name,
-      address: p.location.address,
-      coordinates: [p.location.lng, p.location.lat],
+      name: p.name || 'Unnamed Property',
+      address: p.location.address || 'No address provided',
+      coordinates: [propLng, propLat],
       price: minPrice,
-      images: p.imageUrls.filter((u): u is string => u !== null),
-      amenities: p.amenities,
-      roomAmenities: p.rooms.flatMap((r: { amenities?: string[] }) => r.amenities ?? []),
-      description: p.description,
-      rating: p.rating || 0,
-      distance: Number(distance.toFixed(1)),
+      images: (p.imageUrls || []).filter((u): u is string => u !== null),
+      amenities: p.amenities || [],
+      roomAmenities: safeRooms.flatMap((r: { amenities?: string[] }) => r.amenities ?? []),
+      description: p.description || '',
+      rating: typeof p.rating === 'number' ? p.rating : 0,
+      distance: typeof distance === 'number' && !isNaN(distance) ? Number(distance.toFixed(1)) : 0,
       available: isAvailable,
-      roomTypes: Array.from(new Set(p.rooms.map((r: { type: string }) => r.type)))
+      roomTypes: Array.from(new Set(safeRooms.map((r: { type: string }) => r.type || 'Standard')))
     };
   });
 

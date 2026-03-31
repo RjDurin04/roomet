@@ -95,13 +95,13 @@ export function OwnerSettings() {
         setHasCredentialAccount(false);
       }
     }
-    checkAccount();
+    void checkAccount();
   }, [user]);
 
   React.useEffect(() => {
     if (user?.name) {
       const parts = user.name.split(' ');
-      setFirstName(parts[0] || '');
+      setFirstName(parts[0] ?? '');
       setLastName(parts.slice(1).join(' '));
     }
   }, [user?.name]);
@@ -156,6 +156,7 @@ export function OwnerSettings() {
     }
   };
 
+
   const handleUpdatePassword = async () => {
     setPassError('');
     setPassSuccess('');
@@ -176,7 +177,7 @@ export function OwnerSettings() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Checking internal undocumented methods
         const { error } = await (authClient as any).setPassword({ newPassword });
         if (error) {
-          setPassError(error.message || 'Failed to set password');
+          setPassError(error.message ?? 'Failed to set password');
         } else {
           setPassSuccess('Password set successfully');
           setNewPassword('');
@@ -201,7 +202,7 @@ export function OwnerSettings() {
           if (error.code === 'INVALID_PASSWORD' || error.message?.toLowerCase().includes('password')) {
             setPassError('Invalid current password.');
           } else {
-            setPassError(error.message || 'Failed to update password');
+            setPassError(error.message ?? 'Failed to update password');
           }
         } else {
           setPassSuccess('Password updated successfully');
@@ -237,7 +238,7 @@ export function OwnerSettings() {
                 </div>
               ) : (
                 <img 
-                  src={user?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Owner')}&background=000&color=fff&size=80`} 
+                  src={user?.image ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name ?? 'Owner')}&background=000&color=fff&size=80`} 
                   alt="Avatar" 
                   className="w-20 h-20 rounded-2xl ring-2 ring-border object-cover"
                 />
@@ -248,7 +249,7 @@ export function OwnerSettings() {
               <input type="file" ref={fileInputRef} onChange={handleFileChange} hidden accept="image/*" />
             </div>
             <div className="flex-1">
-              <h2 className="text-lg font-bold">{user?.name || 'Owner Name'}</h2>
+              <h2 className="text-lg font-bold">{user?.name ?? 'Owner Name'}</h2>
               <p className="text-[12px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
                 <Mail className="w-3.5 h-3.5" /> {user?.email}
               </p>
@@ -274,7 +275,7 @@ export function OwnerSettings() {
             </div>
             <div>
               <label className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-1.5 block">Business Email</label>
-              <input type="email" value={user?.email || ''} readOnly className="w-full h-10 bg-muted border border-border/60 rounded-xl px-4 text-[13px] text-muted-foreground outline-none cursor-not-allowed" />
+              <input type="email" value={user?.email ?? ''} readOnly className="w-full h-10 bg-muted border border-border/60 rounded-xl px-4 text-[13px] text-muted-foreground outline-none cursor-not-allowed" />
               <p className="text-[10px] text-muted-foreground mt-1.5 tracking-wide">
                 Email addresses are tied to your authentication and cannot be changed here.
               </p>
@@ -384,8 +385,8 @@ export function OwnerSettings() {
               <p className="text-[13px] font-medium">Log Out</p>
               <p className="text-[11px] text-muted-foreground mt-0.5">Safely exit your owner session</p>
             </div>
-            <button onClick={async () => {
-              await authClient.signOut();
+            <button onClick={() => {
+              void authClient.signOut();
             }} className="px-5 py-2 border border-destructive/30 text-destructive rounded-xl text-[12px] font-bold hover:bg-destructive/10 transition-colors">
               Sign Out
             </button>

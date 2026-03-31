@@ -37,55 +37,57 @@ export function StepLocation({ formData, updateFormData }: StepLocationProps) {
 
   // 2. Auto-geolocation on initial load if no address is set and at default location
   useEffect(() => {
+    if (!navigator.geolocation) return;
+
     const COORD_EPSILON = 0.0001;
     const isDefaultLoc = 
       Math.abs(formData.mapPin.lat - UI_CONSTANTS.MAP_DEFAULT_LAT) < COORD_EPSILON && 
       Math.abs(formData.mapPin.lng - UI_CONSTANTS.MAP_DEFAULT_LNG) < COORD_EPSILON;
 
     // Only auto-locate if it's potentially a fresh entry
-    if (!formData.address && isDefaultLoc && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude: lat, longitude: lng } = position.coords;
-          
-          updateFormData({
-            mapPin: { lat, lng },
-            address: 'Locating...'
-          });
+    if (!formData.address && isDefaultLoc) {
+      const onSuccess = async (position: GeolocationPosition) => {
+        const { latitude: lat, longitude: lng } = position.coords;
+        
+        updateFormData({
+          mapPin: { lat, lng },
+          address: 'Locating...'
+        });
 
-          // Resolve address
-          try {
-            const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`);
-            const data = await resp.json();
-            if (data?.display_name) {
-              updateFormData({ address: data.display_name });
-            }
-          } catch (err) {
-            console.error("[StepLocation] Auto-geocode failed:", err);
-            const COORD_PRECISION = 6;
-            updateFormData({ address: `${lat.toFixed(COORD_PRECISION)}, ${lng.toFixed(COORD_PRECISION)}` });
+        // Resolve address
+        try {
+          const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`);
+          const data = await resp.json();
+          if (data?.display_name) {
+            updateFormData({ address: data.display_name });
           }
+        } catch (err) {
+          console.error("[StepLocation] Auto-geocode failed:", err);
+          updateFormData({ address: `${lat.toFixed(UI_CONSTANTS.COORDINATE_PRECISION)}, ${lng.toFixed(UI_CONSTANTS.COORDINATE_PRECISION)}` });
+        }
 
-          // Move map when instance is ready - use a reliable polling/ready check
-          const moveMap = () => {
-            if (mapRef.current) {
-              mapRef.current.flyTo({
-                center: [lng, lat],
-                zoom: 17,
-                essential: true,
-                duration: 2000
-              });
-            } else {
-              setTimeout(moveMap, 100);
-            }
-          };
-          moveMap();
-        },
-        (error) => {
-          console.warn("[StepLocation] Geolocation blocked or failed:", error);
-        },
-        { enableHighAccuracy: true, timeout: 5000 }
-      );
+        // Move map when instance is ready
+        const moveMap = () => {
+          if (mapRef.current) {
+            mapRef.current.flyTo({ center: [lng, lat], zoom: 17, duration: 2000 });
+          } else {
+            setTimeout(moveMap, 100);
+          }
+        };
+        moveMap();
+      };
+
+      const onError = (error: GeolocationPositionError) => {
+        console.warn("[StepLocation] Geolocation first attempt failed:", error.message);
+        // Fallback: Try without high accuracy (faster for some configurations)
+        if (error.code === error.TIMEOUT || error.code === error.POSITION_UNAVAILABLE) {
+           navigator.geolocation.getCurrentPosition(onSuccess, (e) => {
+             console.warn("[StepLocation] Geolocation ultimate failure:", e.message);
+           }, { enableHighAccuracy: false, timeout: 10000 });
+        }
+      };
+
+      navigator.geolocation.getCurrentPosition(onSuccess, onError, { enableHighAccuracy: true, timeout: 8000 });
     }
   }, []); // Run exactly once on mount
 

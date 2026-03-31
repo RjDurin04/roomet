@@ -28,6 +28,7 @@ export const getMyProfile = query({
 
     return {
       ...authUser,
+      profileId: profile?._id ?? null,
       role: profile?.role ?? null,
       onboardingComplete: profile?.onboardingComplete ?? !!profile?.role,
       name: profile?.name,

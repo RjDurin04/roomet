@@ -124,61 +124,62 @@ export function SidebarOwner() {
           </Link>
         </div>
 
-        <AnimatePresence>
-          {showNotifications && (
-            <motion.div 
-              initial={{ opacity: 0, x: -10, scale: 0.95 }}
-              animate={{ opacity: UI_CONSTANTS.ANIM_OPACITY_VISIBLE, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: -10, scale: 0.95 }}
-              transition={{ duration: UI_CONSTANTS.ANIM_DURATION_FAST }}
-              className="absolute right-0 md:right-auto md:left-16 top-[60px] md:top-auto md:bottom-16 w-[calc(100vw-2rem)] sm:w-80 bg-card rounded-2xl border border-border/50 shadow-2xl overflow-hidden z-[100] transform md:translate-x-0 origin-top-right md:origin-bottom-left"
-            >
-              <div className="p-4 border-b border-border/50 flex justify-between items-center bg-muted/20">
-                <h3 className="font-bold">Notifications</h3>
-                {unreadNotificationsCount > 0 && (
-                  <button 
-                    onClick={handleMarkAllRead}
-                    className="text-[10px] text-primary font-bold uppercase tracking-widest hover:underline"
-                  >
-                    Mark all read
-                  </button>
-                )}
-              </div>
-              <div className="max-h-[300px] overflow-y-auto">
-                {notifications.length > 0 ? notifications.map(n => (
-                  <div 
-                    key={n._id} 
-                    onClick={() => {
-                      const handleClick = async () => {
-                        if (!n.isRead) { 
-                          try {
-                            await markAsRead({ notificationId: n._id });
-                          } catch (err) {
-                            console.error('Failed to mark notification as read:', err);
-                          }
-                        }
-                        void navigate(n.link);
-                        setShowNotifications(false);
-                      };
-                      void handleClick();
-                    }}
-                    className={`p-4 border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors cursor-pointer ${!n.isRead ? 'bg-primary/5' : ''}`}
-                  >
-                    <p className={`text-sm ${!n.isRead ? 'font-bold text-foreground' : 'font-medium text-muted-foreground'}`}>{n.title}</p>
-                    <span className="text-xs text-muted-foreground mt-1 block">{n.body}</span>
-                    <span className="text-[10px] text-muted-foreground/50 mt-1 block">{new Date(n.createdAt).toLocaleString()}</span>
-                  </div>
-                )) : (
-                  <div className="p-6 text-center text-muted-foreground">
-                     <Bell className="w-8 h-8 opacity-20 mx-auto mb-2" />
-                     <p className="text-sm font-medium">No notifications yet</p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
+      
+      <AnimatePresence>
+        {showNotifications && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+            transition={{ duration: UI_CONSTANTS.ANIM_DURATION_FAST }}
+            className="fixed md:absolute inset-x-4 md:inset-x-auto md:left-16 top-16 md:top-auto md:bottom-16 md:w-80 bg-card rounded-2xl border border-border/50 shadow-2xl overflow-hidden z-[100] origin-top md:origin-bottom-left"
+          >
+            <div className="p-4 border-b border-border/50 flex justify-between items-center bg-muted/20">
+              <h3 className="font-bold">Notifications</h3>
+              {unreadNotificationsCount > 0 && (
+                <button 
+                  onClick={handleMarkAllRead}
+                  className="text-[10px] text-primary font-bold uppercase tracking-widest hover:underline"
+                >
+                  Mark all read
+                </button>
+              )}
+            </div>
+            <div className="max-h-[min(400px,70vh)] overflow-y-auto">
+              {notifications.length > 0 ? notifications.map(n => (
+                <div 
+                  key={n._id} 
+                  onClick={() => {
+                    const handleClick = async () => {
+                      if (!n.isRead) { 
+                        try {
+                          await markAsRead({ notificationId: n._id });
+                        } catch (err) {
+                          console.error('Failed to mark notification as read:', err);
+                        }
+                      }
+                      void navigate(n.link);
+                      setShowNotifications(false);
+                    };
+                    void handleClick();
+                  }}
+                  className={`p-4 border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors cursor-pointer ${!n.isRead ? 'bg-primary/5' : ''}`}
+                >
+                  <p className={`text-sm ${!n.isRead ? 'font-bold text-foreground' : 'font-medium text-muted-foreground'}`}>{n.title}</p>
+                  <span className="text-xs text-muted-foreground mt-1 block">{n.body}</span>
+                  <span className="text-[10px] text-muted-foreground/50 mt-1 block">{new Date(n.createdAt).toLocaleString()}</span>
+                </div>
+              )) : (
+                <div className="p-6 text-center text-muted-foreground">
+                   <Bell className="w-8 h-8 opacity-20 mx-auto mb-2" />
+                   <p className="text-sm font-medium">No notifications yet</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </aside>
   );
 }

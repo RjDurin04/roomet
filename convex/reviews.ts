@@ -252,3 +252,60 @@ export const reportReview = mutation({
     await ctx.db.patch(args.reviewId, { status: "Reported" });
   },
 });
+export const update = mutation({
+  args: {
+    id: v.id("reviews"),
+    rating: v.number(),
+    comment: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const authUser = await authComponent.getAuthUser(ctx);
+    if (!authUser) throw new Error("Unauthorized");
+
+    const profile = await ctx.db
+      .query("users")
+      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .unique();
+    if (!profile) throw new Error("Profile not found");
+
+    const review = await ctx.db.get(args.id);
+    if (!review) throw new Error("Review not found");
+
+    if (review.userId !== profile._id) {
+      throw new Error("Only the author can edit their review");
+    }
+
+    if (args.rating < 1 || args.rating > 5) {
+      throw new Error("Rating must be between 1 and 5");
+    }
+
+    await ctx.db.patch(args.id, {
+      rating: args.rating,
+      comment: args.comment,
+      createdAt: Date.now(), // Refresh timestamp on edit
+    });
+  },
+});
+
+export const remove = mutation({
+  args: { id: v.id("reviews") },
+  handler: async (ctx, args) => {
+    const authUser = await authComponent.getAuthUser(ctx);
+    if (!authUser) throw new Error("Unauthorized");
+
+    const profile = await ctx.db
+      .query("users")
+      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .unique();
+    if (!profile) throw new Error("Profile not found");
+
+    const review = await ctx.db.get(args.id);
+    if (!review) throw new Error("Review not found");
+
+    if (review.userId !== profile._id) {
+      throw new Error("Only the author can delete their review");
+    }
+
+    await ctx.db.delete(args.id);
+  },
+});

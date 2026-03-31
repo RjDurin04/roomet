@@ -1,76 +1,40 @@
-/**
- * central source of truth for all magic numbers to comply with strict linting rules.
- */
-
 /* eslint-disable no-magic-numbers */
 export const UI_CONSTANTS = {
-  // Timeouts & Delays
-  MB_BYTES: 1024 * 1024,
-  AUTH_SESSION_TIMEOUT_MS: 15_000,
-  AUTH_SETTLE_GRACE_MS: 150,
-  UPLOAD_TIMEOUT_MS: 30_000,
-  MAP_STYLE_LOAD_DELAY_MS: 100,
-  TOAST_DURATION_MS: 3_000,
-  DEBOUNCE_DELAY_MS: 300,
-  POLLING_INTERVAL_MS: 60_000,
-
-  // Map Defaults & Limits
-  MAP_DEFAULT_ZOOM: 14,
-  MAP_CLUSTER_MAX_ZOOM: 14,
-  MAP_CLUSTER_RADIUS: 50,
-  MAP_CLUSTER_ZOOM_SPEED: 750,
-  MAP_MIN_ZOOM: 3,
-  MAP_MAX_ZOOM: 20,
-  MAP_DEFAULT_LAT: 10.3157,
-  MAP_DEFAULT_LNG: 123.8854,
-  MAP_MARKER_SIZE_PX: 100,
-  MAP_ZOOM_INCREMENT: 1,
-  MAP_BEARING_DEFAULT: 0,
-  MAP_PITCH_DEFAULT: 0,
-  MAP_BOUNDS_PADDING_PX: 40,
-  MAP_LNG_LIMIT: 180,
-  MAP_LAT_LIMIT: 90,
-
-  // Animations (Framer Motion)
-  ANIM_DURATION_FAST: 0.2,
-  ANIM_DURATION_STANDARD: 0.3,
-  ANIM_STAGGER_CHILDREN: 0.05,
-  ANIM_SCALE_HOVER: 1.05,
-  ANIM_SCALE_CLICK: 0.98,
-  ANIM_OPACITY_HIDDEN: 0,
-  ANIM_OPACITY_VISIBLE: 1,
-  ANIM_Y_OFFSET_PX: 20,
-
-  // Layout Thresholds
-  LAYOUT_MAX_WIDTH_PX: 1200,
-  MOBILE_BREAKPOINT_PX: 768,
-  HEADER_HEIGHT_PX: 64,
-  SIDEBAR_WIDTH_PX: 280,
-
-  // Feature Specific
-  MAX_RATING: 5,
-  MIN_PASSWORD_LENGTH: 8,
-  INQUIRY_LIST_LIMIT: 50,
-  COORDINATE_PRECISION: 6,
-  HIGH_RATING_THRESHOLD: 4.5,
-  LOW_RATING_THRESHOLD: 3.0,
-
-  // Upload Limits
-  MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
-  MAX_PROPERTY_IMAGES: 20,
-  MAX_CHAT_IMAGES: 5,
-  MAX_PROFILE_IMAGE_SIZE: 5 * 1024 * 1024, // 5MB
-  ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'] as readonly string[],
-
-  PRICE_MIN: 0,
-  CAPACITY_MIN_SHARED: 2,
-  CAPACITY_SINGLE: 1,
-
-  // Geography & Physics
   EARTH_RADIUS_KM: 6371,
-  CEBU_CENTER: { lat: 10.3119, lng: 123.8962 },
+  MAX_FILE_SIZE: 10 * 1024 * 1024,
+  MAX_PROFILE_IMAGE_SIZE: 5 * 1024 * 1024,
+  MAX_PROPERTY_IMAGES: 15,
+  MAX_CHAT_IMAGES: 5,
+  MB_BYTES: 1024 * 1024,
+  ALLOWED_IMAGE_TYPES: ["image/jpeg", "image/png", "image/webp"],
+  CEBU_CENTER: { lng: 123.891, lat: 10.3157 },
+  AUTH_SETTLE_GRACE_MS: 150,
+  AUTH_SESSION_TIMEOUT_MS: 10000,
+  ANIM_OPACITY_VISIBLE: 1,
+  ANIM_DURATION_FAST: 0.2,
+  COORDINATE_PRECISION: 6,
+  MAP_DEFAULT_LAT: 10.3157,
+  MAP_DEFAULT_LNG: 123.891,
+  MAP_STYLE_LOAD_DELAY_MS: 300,
+} as const;
 
-  MAX_FILE_SIZE_BYTES: 10 * 1024 * 1024, // 10MB
-  MAX_IMAGE_COUNT: 10,
-  ACCEPTED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
-};
+export const RATING_STEPS = [1, 2, 3, 4, 5];
+export const DEFAULT_RATING = 5;
+export const MAX_VISIBLE_AMENITIES = 4;
+export const AUTO_SCROLL_DELAY = 100;
+
+export const MS_PER_MINUTE = 60000;
+export const MINUTES_PER_HOUR = 60;
+export const HOURS_PER_DAY = 24;
+
+export const CHART_DELAY_BASE = 0.3;
+export const CHART_DELAY_STEP = 0.03;
+export const CHART_MIN_OPACITY = 15;
+export const PERCENT_BASE = 100;
+
+export const STATS_DELAY_BASE = 0.1;
+export const STATS_DELAY_STEP = 0.05;
+
+export const REVIEWS_PER_PAGE = 15;
+export const ANIMATION_HOVER_SCALE = 1.01;
+export const ANIMATION_TAP_SCALE = 0.98;

@@ -18,11 +18,19 @@ export function LocationCoordsDisplay({ lat, lng }: LocationCoordsDisplayProps) 
     <div className="grid grid-cols-2 gap-4 mt-2">
       <div className={itemClass}>
         <span className={labelClass}>Latitude</span>
-        <span className={valueClass}>{lat.toFixed(UI_CONSTANTS.COORDINATE_PRECISION)}</span>
+        <span className={valueClass}>
+          {typeof lat === 'number' && !isNaN(lat) 
+            ? lat.toFixed(UI_CONSTANTS.COORDINATE_PRECISION) 
+            : '0.000000'}
+        </span>
       </div>
       <div className={itemClass}>
         <span className={labelClass}>Longitude</span>
-        <span className={valueClass}>{lng.toFixed(UI_CONSTANTS.COORDINATE_PRECISION)}</span>
+        <span className={valueClass}>
+          {typeof lng === 'number' && !isNaN(lng) 
+            ? lng.toFixed(UI_CONSTANTS.COORDINATE_PRECISION) 
+            : '0.000000'}
+        </span>
       </div>
     </div>
   );

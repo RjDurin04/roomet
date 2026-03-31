@@ -1,7 +1,7 @@
 "use client";
 
 import maplibregl from 'maplibre-gl';
-import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
+import { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 
 import { useMap } from './MapContext';
 
@@ -108,7 +108,7 @@ export const MapMarker = forwardRef<maplibregl.Marker, MapMarkerProps>(({
   }, [draggable]);
 
   return (
-    <div style={{ display: 'none' }}>
+    <div className="invisible absolute pointer-events-none">
       <div ref={elementRef}>{children}</div>
     </div>
   );

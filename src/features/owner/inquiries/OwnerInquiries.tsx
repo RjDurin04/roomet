@@ -23,7 +23,7 @@ export function OwnerInquiries() {
   const sendMessage = useMutation(api.inquiries.sendMessage);
   const markAsRead = useMutation(api.inquiries.markAsRead);
   const deleteConversation = useMutation(api.inquiries.deleteConversation);
-  const generateUploadUrl = useMutation(api.properties.generateUploadUrl);
+  const generateUploadUrl = useMutation(api.users.generateUploadUrl);
 
   const [replyText, setReplyText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');

@@ -131,11 +131,10 @@ export const Map = forwardRef<MapRef, MapProps>(function Map(
     const initialStyle = resolvedTheme === "dark" ? mapStyles.dark : mapStyles.light;
     currentStyleRef.current = initialStyle;
 
-    // Sanitize viewport to prevent MapLibre from crashing when receiving null/undefined
+    // Sanitize viewport
     const sanitizedViewport: Record<string, unknown> = { ...viewport };
     if (sanitizedViewport.center && Array.isArray(sanitizedViewport.center) && (sanitizedViewport.center[0] == null || sanitizedViewport.center[1] == null)) {
-      // eslint-disable-next-line no-magic-numbers -- Fallback coordinates
-      sanitizedViewport.center = [-122.4194, 37.7749]; // Default fallback SF center
+      sanitizedViewport.center = [UI_CONSTANTS.CEBU_CENTER.lng, UI_CONSTANTS.CEBU_CENTER.lat];
     }
     if (sanitizedViewport.zoom == null) delete sanitizedViewport.zoom;
     if (sanitizedViewport.pitch == null) delete sanitizedViewport.pitch;
@@ -158,6 +157,16 @@ export const Map = forwardRef<MapRef, MapProps>(function Map(
     };
     
     map.on("load", () => { setIsLoaded(true); });
+
+    // Suppress warnings for missing sprites in third-party styles (e.g. OpenFreeMap POIs)
+    map.on("styleimagemissing", (e) => {
+      const id = e.id;
+      const placeholder = new Uint8Array(4).fill(0); // Transparent pixel
+      if (!map.hasImage(id)) {
+        map.addImage(id, { width: 1, height: 1, data: placeholder });
+      }
+    });
+
     map.on("styledata", styleDataHandler);
     map.on("move", () => {
       if (!internalUpdateRef.current) onViewportChangeRef.current?.(getViewport(map));

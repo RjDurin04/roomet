@@ -28,7 +28,21 @@ export function usePropertyForm(initialData: PropertyFormData, initialImages: Im
   const [formData, setFormData] = useState<PropertyFormData>(() => {
     if (persistenceId && typeof window !== 'undefined') {
       const saved = localStorage.getItem(`bhouse_data_${persistenceId}`);
-      return saved ? JSON.parse(saved) : initialData;
+      if (saved) {
+        try {
+          const data = JSON.parse(saved) as PropertyFormData;
+          // Robust sanitization for critical location data
+          if (typeof data.mapPin?.lat !== 'number' || isNaN(data.mapPin.lat)) {
+            data.mapPin = { ...data.mapPin, lat: UI_CONSTANTS.MAP_DEFAULT_LAT };
+          }
+          if (typeof data.mapPin.lng !== 'number' || isNaN(data.mapPin.lng)) {
+            data.mapPin = { ...data.mapPin, lng: UI_CONSTANTS.MAP_DEFAULT_LNG };
+          }
+          return data;
+        } catch (e) {
+          console.error("[usePropertyForm] Error restoring draft:", e);
+        }
+      }
     }
     return initialData;
   });

@@ -138,11 +138,30 @@ export const listPublic = query({
           
         let rating = 0;
         if (reviews.length > 0) {
-          rating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+          const validReviews = reviews.filter(r => typeof r.rating === 'number' && !isNaN(r.rating));
+          if (validReviews.length > 0) {
+            rating = validReviews.reduce((sum, r) => sum + r.rating, 0) / validReviews.length;
+          }
         }
         rating = Number(rating.toFixed(1));
 
-        return { ...property, imageUrls, rating, reviewsCount: reviews.length };
+        // DEF-008: Sanitize property data against null/NaN in numeric fields
+        const sanitizedProperty = {
+          ...property,
+          location: {
+            ...property.location,
+            lat: typeof property.location.lat === 'number' ? property.location.lat : 10.3157, // Cebu fallback
+            lng: typeof property.location.lng === 'number' ? property.location.lng : 123.891,
+          },
+          rooms: property.rooms.map(room => ({
+            ...room,
+            price: typeof room.price === 'number' ? room.price : 0,
+            capacity: typeof room.capacity === 'number' ? room.capacity : 1,
+            occupied: (typeof room.occupied === 'number' ? room.occupied : 0),
+          }))
+        };
+
+        return { ...sanitizedProperty, imageUrls, rating, reviewsCount: reviews.length };
       })
     );
   },
@@ -325,7 +344,39 @@ export const getById = query({
       })
     );
     
-    return { ...property, imageUrls };
+    const reviews = await ctx.db
+      .query("reviews")
+      .withIndex("by_propertyId", (q) => q.eq("propertyId", property._id))
+      .collect();
+      
+    let rating = 0;
+    if (reviews.length > 0) {
+      rating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+    }
+    
+    // DEF-008: Sanitize property data against null/NaN in numeric fields
+    const sanitizedProperty = {
+      ...property,
+      location: {
+        ...property.location,
+        lat: typeof property.location.lat === 'number' ? property.location.lat : 10.3157, // Cebu fallback
+        lng: typeof property.location.lng === 'number' ? property.location.lng : 123.891,
+      },
+      rooms: property.rooms.map(room => ({
+        ...room,
+        price: typeof room.price === 'number' ? room.price : 0,
+        capacity: typeof room.capacity === 'number' ? room.capacity : 1,
+        occupied: (typeof room.occupied === 'number' ? room.occupied : 0),
+      }))
+    };
+
+    return {
+      ...sanitizedProperty,
+      imageUrls, 
+      rating: Number(rating.toFixed(1)), 
+      reviewsCount: reviews.length,
+      reviews: reviews.sort((a, b) => b.createdAt - a.createdAt)
+    };
   },
 });
 

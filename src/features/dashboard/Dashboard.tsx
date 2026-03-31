@@ -57,9 +57,9 @@ export function Dashboard() {
 
   // Helper to get min price from property rooms
   const getMinPrice = (property: unknown) => {
-    const p = property as any;
+    const p = property as { rooms?: { price: number }[] };
     if (!p.rooms || p.rooms.length === 0) return 0;
-    return Math.min(...p.rooms.map((r: any) => r.price));
+    return Math.min(...p.rooms.map((r) => r.price));
   };
 
   return (
@@ -127,10 +127,10 @@ export function Dashboard() {
             {featured ? (
               <motion.div 
                 whileHover={{ y: -4 }}
-                onClick={() => navigate(`/tenant/map/roomet/${featured._id}`)}
+                onClick={() => { void navigate(`/tenant/map/roomet/${featured._id}`); }}
                 className="relative rounded-[2rem] overflow-hidden h-[280px] md:h-[340px] cursor-pointer group border border-border shadow-lg"
               >
-                <img src={featured.imageUrls?.[0] ?? ''} alt="" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 bg-muted" />
+                <img src={featured.imageUrls[0] ?? ''} alt="" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 bg-muted" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                 
                 <div className="absolute top-4 md:top-6 left-4 md:left-6 flex gap-2">
@@ -227,7 +227,7 @@ export function Dashboard() {
                 ) : (
                   <motion.div key="rev" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="space-y-3 p-2">
                     {reviews.length > 0 ? reviews.slice(0, MAX_REVIEWS).map((rev: unknown) => {
-                      const r = rev as any;
+                      const r = rev as { _id: string; propertyId: string; propertyName: string; rating: number; comment: string; createdAt: number };
                       return (
                       <div 
                         key={r._id} 
@@ -235,12 +235,12 @@ export function Dashboard() {
                         className="p-4 rounded-2xl border border-border/50 bg-background/50 space-y-2 relative overflow-hidden cursor-pointer hover:border-primary/40 hover:bg-muted/30 transition-all group"
                       >
                         <div className="flex justify-between items-start z-10 relative">
-                          <p className="text-[12px] font-bold pr-4 truncate group-hover:text-primary transition-colors">{rev.propertyName}</p>
+                          <p className="text-[12px] font-bold pr-4 truncate group-hover:text-primary transition-colors">{r.propertyName}</p>
                           <div className="flex gap-0.5 text-amber-500 shrink-0">
-                            {Array.from({length: rev.rating}).map((_, i) => <Star key={i} className="w-2.5 h-2.5 fill-current" />)}
+                            {Array.from({length: r.rating}).map((_, i) => <Star key={i} className="w-2.5 h-2.5 fill-current" />)}
                           </div>
                         </div>
-                        <p className="text-[12px] text-muted-foreground line-clamp-2 z-10 relative italic">"{rev.comment}"</p>
+                        <p className="text-[12px] text-muted-foreground line-clamp-2 z-10 relative italic">"{r.comment}"</p>
                         <p className="text-[10px] text-muted-foreground/60 z-10 relative font-medium">{new Date(r.createdAt).toLocaleDateString()}</p>
                       </div>
                     )}) : (
@@ -271,7 +271,7 @@ export function Dashboard() {
             {topRated.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {topRated.map((bh: unknown) => {
-                  const b = bh as any;
+                  const b = bh as { _id: string; name: string; imageUrls: string[]; rating?: number };
                   return (
                   <div 
                     key={b._id} 
@@ -279,14 +279,14 @@ export function Dashboard() {
                     className="flex items-center gap-3 p-3 rounded-2xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-all cursor-pointer group"
                   >
                     <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-muted">
-                      <img src={bh.imageUrls?.[0] ?? ''} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                      <img src={b.imageUrls?.[0] ?? ''} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                     </div>
                     <div className="min-w-0 flex-1 py-1">
-                      <p className="text-[13px] font-bold truncate">{bh.name}</p>
+                      <p className="text-[13px] font-bold truncate">{b.name}</p>
                       <div className="flex items-center justify-between mt-1">
-                        <p className="text-[11px] font-bold text-primary tabular-nums">₱{getMinPrice(bh)}</p>
+                        <p className="text-[11px] font-bold text-primary tabular-nums">₱{getMinPrice(b)}</p>
                         <div className="flex items-center gap-1 text-[11px] font-black text-amber-500">
-                          <Star className="w-3 h-3 fill-current" /> {b.rating || 'N/A'}
+                          <Star className="w-3 h-3 fill-current" /> {b.rating ?? 'N/A'}
                         </div>
                       </div>
                     </div>

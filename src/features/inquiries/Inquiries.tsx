@@ -27,7 +27,7 @@ export function Inquiries() {
   const sendMessage = useMutation(api.inquiries.sendMessage);
   const markAsRead = useMutation(api.inquiries.markAsRead);
   const deleteConversation = useMutation(api.inquiries.deleteConversation);
-  const generateUploadUrl = useMutation(api.properties.generateUploadUrl);
+  const generateUploadUrl = useMutation(api.users.generateUploadUrl);
 
   const [inputValue, setInputValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -331,14 +331,14 @@ export function Inquiries() {
                       : 'bg-card border border-border/50 text-foreground rounded-2xl rounded-bl-md'
                     } px-4 py-2.5 shadow-sm`}>
                       {/* Legacy single image + New array images */}
-                      {(msg.imageUrl != null || (msg.imageUrls != null && msg.imageUrls.length > 0)) && (
+                      {(msg.imageUrl || (msg.imageUrls && msg.imageUrls.length > 0)) && (
                          <div className="flex flex-wrap gap-2 mb-2">
                            {msg.imageUrl && (
                               <div onClick={() => { setViewImage(msg.imageUrl!); }} className={`w-32 h-32 md:w-48 md:h-48 rounded-lg overflow-hidden border cursor-zoom-in ${isUser ? 'border-primary-foreground/20 hover:border-primary-foreground/50' : 'border-primary/20 hover:border-primary/50'} transition-all shadow-sm shrink-0`}>
                                  <img src={msg.imageUrl} alt="attached" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 pointer-events-none" />
                               </div>
                            )}
-                           {msg.imageUrls !== undefined && msg.imageUrls.map((url: string, imgIdx: number) => (
+                           {msg.imageUrls?.map((url: string, imgIdx: number) => (
                               <div key={imgIdx} onClick={() => { setViewImage(url); }} className={`w-32 h-32 md:w-48 md:h-48 rounded-lg overflow-hidden border cursor-zoom-in ${isUser ? 'border-primary-foreground/20 hover:border-primary-foreground/50' : 'border-primary/20 hover:border-primary/50'} transition-all shadow-sm shrink-0`}>
                                  <img src={url} alt="attached" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 pointer-events-none" />
                               </div>

@@ -17,7 +17,7 @@ export function StepGallery({ images, setImages, errors }: StepGalleryProps) {
     const remainingSlots = MAX_IMAGES - images.length;
     if (remainingSlots <= 0) return;
 
-    const files = Array.from(e.target.files || []).slice(0, remainingSlots);
+    const files = Array.from(e.target.files ?? []).slice(0, remainingSlots);
     const newItems = files.map(file => ({
       url: URL.createObjectURL(file),
       file

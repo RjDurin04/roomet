@@ -16,8 +16,11 @@ async function requireUser(ctx: MutationCtx | QueryCtx) {
   return user;
 }
 
-export const startConversation = mutation({
-  args: { propertyId: v.id("properties") },
+export const create = mutation({
+  args: { 
+    propertyId: v.id("properties"),
+    message: v.optional(v.string())
+  },
   handler: async (ctx, args) => {
     const user = await requireUser(ctx);
     
@@ -30,6 +33,7 @@ export const startConversation = mutation({
     }
 
     // Check if conversation already exists
+    let convId;
     const existing = await ctx.db
       .query("conversations")
       .withIndex("by_viewer_property", (q) => 
@@ -38,6 +42,7 @@ export const startConversation = mutation({
       .unique();
 
     if (existing) {
+      convId = existing._id;
       if (existing.status === "archived" || existing.ownerDeleted || existing.viewerDeleted) {
          await ctx.db.patch(existing._id, { 
            status: "active", 
@@ -46,17 +51,43 @@ export const startConversation = mutation({
            ownerDeleted: false
          });
       }
-      return existing._id;
+    } else {
+      // Create a new conversation
+      convId = await ctx.db.insert("conversations", {
+        propertyId: args.propertyId,
+        viewerId: user._id,
+        ownerId: property.ownerId,
+        status: "active",
+        updatedAt: Date.now(),
+      });
     }
 
-    // Create a new conversation
-    const convId = await ctx.db.insert("conversations", {
-      propertyId: args.propertyId,
-      viewerId: user._id,
-      ownerId: property.ownerId,
-      status: "active",
-      updatedAt: Date.now(),
-    });
+    // If an initial message is provided, send it
+    if (args.message) {
+      const messageId = await ctx.db.insert("messages", {
+        conversationId: convId,
+        senderId: user._id,
+        text: args.message,
+        isRead: false,
+        createdAt: Date.now(),
+      });
+
+      await ctx.db.patch(convId, {
+        lastMessageId: messageId,
+        updatedAt: Date.now(),
+      });
+      
+      // Also notify the owner
+      await ctx.db.insert("notifications", {
+        userId: property.ownerId,
+        type: "new_message",
+        title: "New Inquiry",
+        body: `${user.name || "A user"} inquired about ${property.name}.`,
+        link: "/owner/inquiries",
+        isRead: false,
+        createdAt: Date.now(),
+      });
+    }
 
     return convId;
   },

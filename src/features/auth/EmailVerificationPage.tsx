@@ -116,7 +116,7 @@ export function EmailVerificationPage() {
             </motion.div>
           ) : (
             <button
-              onClick={handleResend}
+              onClick={() => { void handleResend(); }}
               disabled={resending}
               className="inline-flex items-center gap-2 text-[13px] font-bold text-primary hover:underline disabled:opacity-50 mb-4"
             >

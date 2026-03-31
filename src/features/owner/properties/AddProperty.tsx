@@ -59,12 +59,12 @@ export function AddProperty() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24 md:pb-32">
+    <div className="min-h-full bg-background pb-36 md:pb-48">
       <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/40 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="h-20 md:h-28 flex flex-col justify-center gap-4">
             {/* Horizontal Stepper */}
-            <div className="flex items-center justify-between w-full max-w-4xl mx-auto px-0 md:px-2 overflow-x-auto scrollbar-none">
+            <div className="flex items-center justify-between w-full max-w-4xl mx-auto px-0 md:px-2">
               {steps.map((step, index) => {
                 const isActive = pf.currentStep === index;
                 const isCompleted = pf.currentStep > index;
@@ -99,7 +99,7 @@ export function AddProperty() {
 
                     {/* Connecting Line */}
                     {index < steps.length - 1 && (
-                      <div className="flex-1 mx-2 md:mx-4 h-0.5 min-w-[16px] md:min-w-[30px] bg-muted/30 rounded-full overflow-hidden">
+                      <div className="flex-1 mx-1 md:mx-4 h-0.5 min-w-[8px] md:min-w-[30px] bg-muted/30 rounded-full overflow-hidden">
                         <motion.div 
                           initial={false}
                           animate={{ width: isCompleted ? '100%' : '0%' }}
@@ -125,6 +125,8 @@ export function AddProperty() {
         >
           {renderStepContent()}
         </motion.div>
+        {/* Spacer to ensure content clears fixed footer */}
+        <div className="h-28 md:h-44" />
       </main>
 
       <footer className="fixed bottom-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-t border-border/40">

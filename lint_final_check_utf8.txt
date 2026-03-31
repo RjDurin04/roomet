@@ -1,0 +1,120 @@
+﻿
+> roomet@0.0.0 lint
+> eslint src --max-warnings 0
+
+
+C:\Projects\bhouse\frontend\src\features\auth\LoginPage.tsx
+  12:8  error  Function 'LoginPage' has too many lines (113). Maximum allowed is 80  max-lines-per-function
+
+C:\Projects\bhouse\frontend\src\features\auth\components\LoginForm.tsx
+  21:8  error  Function 'LoginForm' has too many lines (129). Maximum allowed is 80  max-lines-per-function
+
+C:\Projects\bhouse\frontend\src\features\auth\hooks\useAuth.ts
+  2:1  error  There should be at least one empty line between import groups  import/order
+
+C:\Projects\bhouse\frontend\src\features\boarding-house\BoardingHouseDetails.tsx
+   11:8   error  Function 'BoardingHouseDetails' has too many lines (136). Maximum allowed is 80    max-lines-per-function
+   11:8   error  Function 'BoardingHouseDetails' has a complexity of 16. Maximum allowed is 15      complexity
+  131:32  error  Promise-returning function provided to attribute where a void return was expected  @typescript-eslint/no-misused-promises
+
+C:\Projects\bhouse\frontend\src\features\boarding-house\components\ImageLightbox.tsx
+   2:1   error  `framer-motion` import should occur before import of `lucide-react`  import/order
+  57:16  error  Unnecessary conditional, the types have no overlap                   @typescript-eslint/no-unnecessary-condition
+  58:27  error  Generic Object Injection Sink                                        security/detect-object-injection
+
+C:\Projects\bhouse\frontend\src\features\boarding-house\components\InfoTab.tsx
+   2:1    error  There should be at least one empty line between import groups               import/order
+   3:1    error  `./MapWidget` import should occur after import of `./common/SectionHeader`  import/order
+   4:1    error  `./RoomCard` import should occur after import of `./common/SectionHeader`   import/order
+  61:23   error  Unnecessary optional chain on a non-nullish value                           @typescript-eslint/no-unnecessary-condition
+  75:112  error  Unnecessary optional chain on a non-nullish value                           @typescript-eslint/no-unnecessary-condition
+
+C:\Projects\bhouse\frontend\src\features\boarding-house\components\PropertyHeader.tsx
+  1:1  error  There should be at least one empty line between import groups  import/order
+  2:1  error  There should be at least one empty line between import groups  import/order
+
+C:\Projects\bhouse\frontend\src\features\boarding-house\components\ReviewForm.tsx
+  1:1   error  There should be at least one empty line between import groups    import/order
+  2:1   error  There should be at least one empty line between import groups    import/order
+  3:1   error  `react` type import should occur before import of `@/lib/utils`  import/order
+  5:29  error  No magic number: 3                                               no-magic-numbers
+  5:32  error  No magic number: 4                                               no-magic-numbers
+  5:35  error  No magic number: 5                                               no-magic-numbers
+
+C:\Projects\bhouse\frontend\src\features\boarding-house\components\ReviewSection.tsx
+  5:1   error  There should be at least one empty line between import groups     import/order
+  5:1   error  `@/lib/utils` import should occur after import of `./ReviewItem`  import/order
+  9:29  error  No magic number: 3                                                no-magic-numbers
+  9:32  error  No magic number: 4                                                no-magic-numbers
+  9:35  error  No magic number: 5                                                no-magic-numbers
+
+C:\Projects\bhouse\frontend\src\features\boarding-house\components\RoomCard.tsx
+  37:25  error  Unnecessary optional chain on a non-nullish value                                                          @typescript-eslint/no-unnecessary-condition
+  40:30  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  45:28  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Projects\bhouse\frontend\src\features\boarding-house\components\common\Section.tsx
+   4:9   error  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+  15:43  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Projects\bhouse\frontend\src\features\boarding-house\components\common\SectionHeader.tsx
+   2:9   error  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+  10:45  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Projects\bhouse\frontend\src\features\boarding-house\hooks\useBoardingHouseDetails.ts
+   3:1   error  There should be at least one empty line between import groups                                              import/order
+  10:8   error  Function 'useBoardingHouseDetails' has too many lines (104). Maximum allowed is 80                         max-lines-per-function
+  89:30  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Projects\bhouse\frontend\src\features\inquiries\Inquiries.tsx
+  334:38  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  334:42  error  Unnecessary conditional, value is always truthy                                                            @typescript-eslint/no-unnecessary-condition
+  341:42  error  Unnecessary optional chain on a non-nullish value                                                          @typescript-eslint/no-unnecessary-condition
+
+C:\Projects\bhouse\frontend\src\features\owner\inquiries\OwnerInquiries.tsx
+  191:24  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  298:46  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  305:45  error  Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+
+C:\Projects\bhouse\frontend\src\features\owner\owner-dashboard\OwnerDashboard.tsx
+   2:10  warning  'motion' is defined but never used. Allowed unused vars must match /^_/u                            @typescript-eslint/no-unused-vars
+   3:16  warning  'TrendingUp' is defined but never used. Allowed unused vars must match /^_/u                        @typescript-eslint/no-unused-vars
+   3:39  warning  'Sparkles' is defined but never used. Allowed unused vars must match /^_/u                          @typescript-eslint/no-unused-vars
+   6:1   error    There should be at least one empty line between import groups                                       import/order
+  37:25  error    Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  37:35  error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  37:46  error    No magic number: 4                                                                                  no-magic-numbers
+
+C:\Projects\bhouse\frontend\src\features\owner\owner-dashboard\components\InquiryChart.tsx
+  41:47  error  No magic number: 15   no-magic-numbers
+  41:86  error  No magic number: 100  no-magic-numbers
+
+C:\Projects\bhouse\frontend\src\features\owner\owner-dashboard\components\OwnerStatButton.tsx
+   3:1   error  `lucide-react` type import should occur before import of `react-router-dom`  import/order
+  19:50  error  No magic number: 0.16                                                        no-magic-numbers
+  19:59  error  No magic number: 0.3                                                         no-magic-numbers
+
+C:\Projects\bhouse\frontend\src\features\owner\owner-dashboard\components\RecentActivity.tsx
+  2:1  error  There should be at least one empty line between import groups  import/order
+
+C:\Projects\bhouse\frontend\src\features\owner\owner-dashboard\components\TopPerformingProperties.tsx
+  56:92  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Projects\bhouse\frontend\src\features\owner\properties\components\PropertyDetailsModal.tsx
+  28:3  warning  'onEdit' is defined but never used. Allowed unused args must match /^_/u      @typescript-eslint/no-unused-vars
+  29:3  warning  'onDelete' is defined but never used. Allowed unused args must match /^_/u    @typescript-eslint/no-unused-vars
+  30:3  warning  'isDeleting' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\Projects\bhouse\frontend\src\features\owner\properties\components\StepGallery.tsx
+  20:45  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+C:\Projects\bhouse\frontend\src\lib\utils.ts
+  10:37  error  No magic number: 60000  no-magic-numbers
+  12:17  error  No magic number: 60     no-magic-numbers
+  13:38  error  No magic number: 60     no-magic-numbers
+  14:15  error  No magic number: 24     no-magic-numbers
+  15:35  error  No magic number: 24     no-magic-numbers
+
+Γ£û 66 problems (60 errors, 6 warnings)
+  16 errors and 0 warnings potentially fixable with the `--fix` option.
+
