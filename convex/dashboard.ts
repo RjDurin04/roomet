@@ -4,7 +4,7 @@ import { authComponent } from "./auth";
 
 export const getOwnerStats = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx: any) => {
     // 1. Authenticate user
     let authUser;
     try {
@@ -18,7 +18,7 @@ export const getOwnerStats = query({
 
     const profile = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
 
     if (!profile || profile.role !== "owner") return null;
@@ -26,23 +26,23 @@ export const getOwnerStats = query({
     // 2. Fetch properties
     const properties = await ctx.db
       .query("properties")
-      .withIndex("by_ownerId", (q) => q.eq("ownerId", profile._id))
+      .withIndex("by_ownerId", (q: any) => q.eq("ownerId", profile._id))
       .collect();
 
     const activePropertiesCount = properties.filter(
-      (p) => p.status === "Active" || (p.isVisible && p.status !== "Inactive")
+      (p: any) => p.status === "Active" || (p.isVisible && p.status !== "Inactive")
     ).length;
 
     // 3. Fetch reviews to calculate average rating
     let totalRating = 0;
     let reviewCount = 0;
     await Promise.all(
-      properties.map(async (p) => {
+      properties.map(async (p: any) => {
         const reviews = await ctx.db
           .query("reviews")
-          .withIndex("by_propertyId", (q) => q.eq("propertyId", p._id))
+          .withIndex("by_propertyId", (q: any) => q.eq("propertyId", p._id))
           .collect();
-        reviews.forEach((r) => {
+        reviews.forEach((r: any) => {
           totalRating += r.rating;
           reviewCount++;
         });
@@ -53,10 +53,10 @@ export const getOwnerStats = query({
     // 4. Fetch inquiries (conversations)
     const conversations = await ctx.db
       .query("conversations")
-      .withIndex("by_owner", (q) => q.eq("ownerId", profile._id))
+      .withIndex("by_owner", (q: any) => q.eq("ownerId", profile._id))
       .collect();
 
-    const activeConversations = conversations.filter((c) => !c.ownerDeleted);
+    const activeConversations = conversations.filter((c: any) => !c.ownerDeleted);
     const inquiriesCount = activeConversations.length;
 
     // 5. Calculate monthly trends (last 6 months of inquiries)
@@ -73,37 +73,37 @@ export const getOwnerStats = query({
       });
     }
 
-    activeConversations.forEach((c) => {
+    activeConversations.forEach((c: any) => {
       const date = new Date(c._creationTime);
       const m = months.find(
-        (m) => m.monthNum === date.getMonth() && m.year === date.getFullYear()
+        (m: any) => m.monthNum === date.getMonth() && m.year === date.getFullYear()
       );
       if (m) {
         m.inquiries++;
       }
     });
 
-    const monthlyTrends = months.map((m) => ({
+    const monthlyTrends = months.map((m: any) => ({
       month: m.month,
       inquiries: m.inquiries,
     }));
 
     // 6. Hydrate top 5 recent inquiries
     const recentConversations = activeConversations
-      .sort((a, b) => b.updatedAt - a.updatedAt)
+      .sort((a: any, b: any) => b.updatedAt - a.updatedAt)
       .slice(0, 5);
 
     const hydratedRecentInquiries = await Promise.all(
-      recentConversations.map(async (conv) => {
-        const property = properties.find((p) => p._id === conv.propertyId);
+      recentConversations.map(async (conv: any) => {
+        const property = properties.find((p: any) => p._id === conv.propertyId);
         const viewer = await ctx.db.get(conv.viewerId);
 
         // Count unread
         const cutoff = conv.ownerMessagesCutoff;
         let unreadMsgs = await ctx.db
           .query("messages")
-          .withIndex("by_conversation", (q) => q.eq("conversationId", conv._id))
-          .filter((q) =>
+          .withIndex("by_conversation", (q: any) => q.eq("conversationId", conv._id))
+          .filter((q: any) =>
             q.and(
               q.eq(q.field("isRead"), false),
               q.neq(q.field("senderId"), profile._id)
@@ -112,7 +112,7 @@ export const getOwnerStats = query({
           .collect();
 
         if (cutoff) {
-          unreadMsgs = unreadMsgs.filter((m) => m._creationTime >= cutoff);
+          unreadMsgs = unreadMsgs.filter((m: any) => m._creationTime >= cutoff);
         }
 
         let lastMessageText = "Sent an attachment";

@@ -5,7 +5,7 @@ import { authComponent } from "./auth";
 // Get the current user's app profile (including role)
 export const getMyProfile = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx: any) => {
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
@@ -21,7 +21,7 @@ export const getMyProfile = query({
 
     const profile = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
       
 
@@ -43,13 +43,13 @@ export const syncProfile = mutation({
     name: v.optional(v.string()),
     image: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const authUser = await authComponent.getAuthUser(ctx);
     if (!authUser) return;
 
     const profile = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
 
     if (profile) {
@@ -65,7 +65,7 @@ export const setRole = mutation({
   args: {
     role: v.union(v.literal("viewer"), v.literal("owner")),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const authUser = await authComponent.getAuthUser(ctx);
     if (!authUser) {
       throw new Error("Not authenticated");
@@ -74,7 +74,7 @@ export const setRole = mutation({
     // Check if profile already exists
     const existing = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
       
 
@@ -106,7 +106,7 @@ export const generateUploadUrl = mutation(async (ctx) => {
 
 export const updateProfileImage = mutation({
   args: { storageId: v.id("_storage") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const authUser = await authComponent.getAuthUser(ctx);
     if (!authUser) throw new Error("Not authenticated");
 
@@ -115,7 +115,7 @@ export const updateProfileImage = mutation({
 
     const profile = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
 
     if (profile) {

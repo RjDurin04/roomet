@@ -15,7 +15,7 @@ interface AmenitiesListProps {
 export function AmenitiesList({ amenities, selectedAmenities, onToggle }: AmenitiesListProps) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {amenities.map((amenity, idx) => {
+      {amenities.map((amenity: any, idx: any) => {
         const isSelected = selectedAmenities.includes(amenity);
         return (
           <motion.button

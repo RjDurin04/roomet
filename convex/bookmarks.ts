@@ -9,7 +9,7 @@ async function requireUser(ctx: MutationCtx | QueryCtx) {
   if (!authUser) throw new Error("Unauthorized");
   const user = await ctx.db
     .query("users")
-    .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+    .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
     .first();
   if (!user) throw new Error("User not found");
   return user;
@@ -17,13 +17,13 @@ async function requireUser(ctx: MutationCtx | QueryCtx) {
 
 export const toggle = mutation({
   args: { propertyId: v.id("properties") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: MutationCtx, args: { propertyId: any }) => {
     const user = await requireUser(ctx);
     
     // Check if bookmark exists
     const existing = await ctx.db
       .query("bookmarks")
-      .withIndex("by_user_property", (q) => 
+      .withIndex("by_user_property", (q: any) => 
         q.eq("userId", user._id).eq("propertyId", args.propertyId)
       )
       .unique();
@@ -43,7 +43,7 @@ export const toggle = mutation({
 
 export const check = query({
   args: { propertyId: v.id("properties") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: QueryCtx, args: { propertyId: any }) => {
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
@@ -52,17 +52,17 @@ export const check = query({
       throw e;
     }
     if (!authUser) return false;
-
+    
     const user = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .first();
       
     if (!user) return false;
-
+    
     const existing = await ctx.db
       .query("bookmarks")
-      .withIndex("by_user_property", (q) => 
+      .withIndex("by_user_property", (q: any) => 
         q.eq("userId", user._id).eq("propertyId", args.propertyId)
       )
       .first();
@@ -73,7 +73,7 @@ export const check = query({
 
 export const getUserBookmarks = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx: QueryCtx) => {
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
@@ -85,19 +85,19 @@ export const getUserBookmarks = query({
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .first();
       
     if (!user) return [];
 
     const bookmarks = await ctx.db
       .query("bookmarks")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .withIndex("by_userId", (q: any) => q.eq("userId", user._id))
       .collect();
 
     // Map properties for UI
     const properties = await Promise.all(
-      bookmarks.map(async (bk) => {
+      bookmarks.map(async (bk: any) => {
         const p = await ctx.db.get(bk.propertyId);
         if (!p || p.status === "Deleted" || p.isVisible === false) return null;
 
@@ -105,26 +105,26 @@ export const getUserBookmarks = query({
         let imageUrls: (string | null)[] = [];
         if (p.images && p.images.length > 0) {
           imageUrls = await Promise.all(
-            p.images.map((id) => ctx.storage.getUrl(id))
+            p.images.map((id: any) => ctx.storage.getUrl(id))
           );
         }
 
         // Compute rating based on reviews
         const reviews = await ctx.db
           .query("reviews")
-          .withIndex("by_propertyId", q => q.eq("propertyId", p._id))
+          .withIndex("by_propertyId", (q: any) => q.eq("propertyId", p._id))
           .collect();
           
         let rating = 0;
         if (reviews.length > 0) {
-           rating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+           rating = reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / reviews.length;
         }
 
-        const isAvailable = p.rooms?.some(r => (r.occupied ?? 0) < r.capacity) ?? false;
+        const isAvailable = p.rooms?.some((r: any) => (r.occupied ?? 0) < r.capacity) ?? false;
         
         let prices = [0];
         if (p.rooms && p.rooms.length > 0) {
-           prices = p.rooms.map(r => r.price);
+           prices = p.rooms.map((r: any) => r.price);
         }
 
         return {

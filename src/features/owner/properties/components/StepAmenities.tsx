@@ -16,7 +16,7 @@ export function StepAmenities({ formData, setFormData }: StepAmenitiesProps) {
 
   const toggleAmenity = (label: string) => {
     const newAmenities = formData.amenities.includes(label)
-      ? formData.amenities.filter(a => a !== label)
+      ? formData.amenities.filter((a: any) => a !== label)
       : [...formData.amenities, label];
     setFormData({ ...formData, amenities: newAmenities });
   };
@@ -78,7 +78,7 @@ export function StepAmenities({ formData, setFormData }: StepAmenitiesProps) {
 
           {/* Combined Selected Amenities Tags */}
           <div className="flex flex-wrap gap-2">
-            {formData.amenities.map((amenity, idx) => (
+            {formData.amenities.map((amenity: any, idx: any) => (
               <span
                 key={idx}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-xl text-[10px] font-black uppercase tracking-widest border border-primary/20 animate-in zoom-in-50 duration-300"

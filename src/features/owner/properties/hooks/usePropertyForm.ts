@@ -93,7 +93,7 @@ export function usePropertyForm(initialData: PropertyFormData, initialImages: Im
       if (formData.rooms.length === 0) {
         newErrors['rooms'] = 'At least one unit is required';
       } else {
-        formData.rooms.forEach((room, idx) => {
+        formData.rooms.forEach((room: any, idx: any) => {
           if (!room.name.trim()) newErrors[`rooms.${idx}.name`] = 'Required';
           if (!room.type) newErrors[`rooms.${idx}.type`] = 'Required';
           if (room.price <= 0) newErrors[`rooms.${idx}.price`] = 'Required';

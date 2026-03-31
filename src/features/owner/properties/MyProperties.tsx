@@ -137,7 +137,7 @@ export function MyProperties() {
           property={viewingDetails} 
           isOpen={!!viewingDetails}
           onClose={() => setViewingDetails(null)}
-          onEdit={(id) => navigate(`/owner/properties/edit/${id}`)}
+          onEdit={(id: any) => navigate(`/owner/properties/edit/${id}`)}
           onDelete={handleDelete}
           isDeleting={isDeletingId === viewingDetails._id}
         />

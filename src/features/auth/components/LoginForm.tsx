@@ -7,7 +7,7 @@ interface LoginFormProps {
   mode: "signin" | "signup";
   onSubmit: (e: React.FormEvent) => void;
   loading: boolean;
-  error: string | null;
+  error: string | undefined | null;
   name: string;
   setName: (name: string) => void;
   email: string;
@@ -47,7 +47,7 @@ export function LoginForm({
   );
 }
 
-function ErrorAlert({ error }: { error: string | null }) {
+function ErrorAlert({ error }: { error: string | undefined | null }) {
   return (
     <AnimatePresence mode="wait">
       {error && (
@@ -96,7 +96,7 @@ function PasswordField({ password, setPassword, showPassword, setShowPassword, s
         </button>
       </div>
       {showHint && <p className="text-[10px] text-muted-foreground mt-1.5">Must be at least 8 characters</p>}
-      {showForgot && <div className="mt-1.5 text-right"><Link to="/forgot-password" size="xs" className="text-[11px] font-medium text-primary hover:underline">Forgot password?</Link></div>}
+      {showForgot && <div className="mt-1.5 text-right"><Link title="forgot password?" to="/forgot-password"  className="text-[11px] font-medium text-primary hover:underline">Forgot password?</Link></div>}
     </div>
   );
 }

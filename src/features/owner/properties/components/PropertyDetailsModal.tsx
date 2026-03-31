@@ -15,19 +15,16 @@ interface PropertyDetailsModalProps {
   property: any;
   isOpen: boolean;
   onClose: () => void;
-  _onEdit?: () => void;
-  _onDelete?: () => void;
-  _isDeleting?: boolean;
+  onEdit?: (id: any) => void;
+  onDelete?: (id: string, name: string) => Promise<void>;
+  isDeleting?: boolean;
 }
 
 // eslint-disable-next-line max-lines-per-function -- Modal contains extensive unified property details structure
 export function PropertyDetailsModal({
   property,
   isOpen,
-  onClose,
-  onEdit,
-  onDelete,
-  isDeleting
+  onClose
 }: PropertyDetailsModalProps) {
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
 

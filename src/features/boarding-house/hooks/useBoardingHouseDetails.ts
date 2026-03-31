@@ -30,10 +30,10 @@ export function useBoardingHouseDetails() {
   const bh = useMemo(() => {
     if (!bhData) return null;
     const rooms = bhData.rooms ?? [];
-    const minPrice = rooms.length > 0 ? Math.min(...rooms.map(r => r.price)) : 0;
+    const minPrice = rooms.length > 0 ? Math.min(...rooms.map((r: any) => r.price)) : 0;
     
     // A property is available if at least one room has vacancy
-    const isAvailable = rooms.some(r => (r.occupied ?? 0) < r.capacity);
+    const isAvailable = rooms.some((r: any) => (r.occupied ?? 0) < r.capacity);
     
     return { 
       ...bhData, 
@@ -46,13 +46,12 @@ export function useBoardingHouseDetails() {
   }, [bhData]);
 
   useEffect(() => {
-    if (targetReviewId) {
-      const scrollTimer = setTimeout(() => {
-        const el = document.getElementById(`review-${targetReviewId}`);
-        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, AUTO_SCROLL_DELAY);
-      return () => clearTimeout(scrollTimer);
-    }
+    if (!targetReviewId) return;
+    const scrollTimer = setTimeout(() => {
+      const el = document.getElementById(`review-${targetReviewId}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, AUTO_SCROLL_DELAY);
+    return () => clearTimeout(scrollTimer);
   }, [targetReviewId]);
 
   const toggleBookmark = () => {

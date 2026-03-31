@@ -58,7 +58,7 @@ export function StepUnits({ formData, setFormData, errors }: StepUnitsProps) {
   const removeUnit = (id: string) => {
     setFormData({
       ...formData,
-      rooms: formData.rooms.filter(r => r.id !== id)
+      rooms: formData.rooms.filter((r: any) => r.id !== id)
     });
   };
 
@@ -76,7 +76,7 @@ export function StepUnits({ formData, setFormData, errors }: StepUnitsProps) {
         </button>
       </div>
       <div className="grid grid-cols-1 gap-4">
-        {formData.rooms.map((room, idx) => (
+        {formData.rooms.map((room: any, idx: any) => (
           <RoomUnitCard
             key={room.id}
             room={room}

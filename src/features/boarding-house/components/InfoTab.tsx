@@ -59,7 +59,7 @@ export function InfoTab({
         <div className="p-4 bg-white/5 border border-white/10 rounded-2xl space-y-3">
           <SectionHeader icon={ShieldCheck} title="Amenities" color="text-emerald-500" />
           <div className="flex flex-wrap gap-1.5">
-            {amenities?.slice(0, MAX_VISIBLE_AMENITIES).map((am, i) => (
+            {amenities?.slice(0, MAX_VISIBLE_AMENITIES).map((am: any, i: any) => (
               <AmenityBadge key={i} name={am} />
             ))}
             {amenities.length > MAX_VISIBLE_AMENITIES && (
@@ -73,9 +73,9 @@ export function InfoTab({
 
       <Section icon={Info} title="Description" content={<p className="text-sm font-bold leading-relaxed text-white/80 relative z-10">{description}</p>} />
 
-      <Section icon={BedDouble} title="Available Rooms" content={<div className="grid grid-cols-1 gap-3">{rooms?.map((room, i) => <RoomCard key={i} room={room} index={i} />)}</div>} />
+      <Section icon={BedDouble} title="Available Rooms" content={<div className="grid grid-cols-1 gap-3">{rooms?.map((room: any, i: any) => <RoomCard key={i} room={room} index={i} />)}</div>} />
 
-      <Section icon={MessageSquare} title="House Rules" color="text-primary/40" content={<div className="space-y-4">{rules.split('\n').filter(l => l.trim()).map((rule, i) => <RuleItem key={i} text={rule} />)}</div>} accent />
+      <Section icon={MessageSquare} title="House Rules" color="text-primary/40" content={<div className="space-y-4">{rules.split('\n').filter((l: any) => l.trim()).map((rule: any, i: any) => <RuleItem key={i} text={rule} />)}</div>} accent />
     </motion.div>
   );
 }

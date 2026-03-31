@@ -8,7 +8,7 @@ interface UnitTypeSelectProps {
   currentType: string;
   currentGender: string;
   onUpdate: (updates: { type?: string; gender?: string }) => void;
-  error?: string;
+  error?: string | undefined;
 }
 
 export function UnitTypeSelect({ currentType, currentGender, onUpdate, error }: UnitTypeSelectProps) {
@@ -44,7 +44,7 @@ export function UnitTypeSelect({ currentType, currentGender, onUpdate, error }: 
                   exit={{ opacity: 0, y: -10 }}
                   className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden py-1"
                 >
-                  {types.map(t => (
+                  {types.map((t: any) => (
                     <button
                       key={t}
                       type="button"
@@ -66,7 +66,7 @@ export function UnitTypeSelect({ currentType, currentGender, onUpdate, error }: 
           <Users className="w-3 h-3" /> Gender Policy
         </label>
         <div className="flex bg-muted/30 p-1 rounded-xl border border-border/50">
-          {genders.map(g => (
+          {genders.map((g: any) => (
             <button
               key={g}
               type="button" // Important for forms

@@ -4,10 +4,10 @@ import { authComponent } from "./auth";
 
 export const getByProperty = query({
   args: { propertyId: v.id("properties") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     return await ctx.db
       .query("reviews")
-      .withIndex("by_propertyId", (q) => q.eq("propertyId", args.propertyId))
+      .withIndex("by_propertyId", (q: any) => q.eq("propertyId", args.propertyId))
       .order("desc")
       .collect();
   },
@@ -15,17 +15,17 @@ export const getByProperty = query({
 
 export const getStats = query({
   args: { propertyId: v.id("properties") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const reviews = await ctx.db
       .query("reviews")
-      .withIndex("by_propertyId", (q) => q.eq("propertyId", args.propertyId))
+      .withIndex("by_propertyId", (q: any) => q.eq("propertyId", args.propertyId))
       .collect();
       
     if (reviews.length === 0) {
       return { rating: 0, count: 0 };
     }
     
-    const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+    const sum = reviews.reduce((acc: any, review: any) => acc + review.rating, 0);
     return {
       rating: Number((sum / reviews.length).toFixed(1)),
       count: reviews.length,
@@ -39,7 +39,7 @@ export const create = mutation({
     rating: v.number(),
     comment: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const authUser = await authComponent.getAuthUser(ctx);
     if (!authUser) {
       throw new Error("You must be logged in to leave a review");
@@ -47,7 +47,7 @@ export const create = mutation({
 
     const profile = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
 
     if (!profile) {
@@ -71,7 +71,7 @@ export const create = mutation({
     // Check if user already reviewed
     const existingReview = await ctx.db
       .query("reviews")
-      .withIndex("by_property_user", (q) => 
+      .withIndex("by_property_user", (q: any) => 
         q.eq("propertyId", args.propertyId).eq("userId", profile._id)
       )
       .unique();
@@ -88,8 +88,8 @@ export const create = mutation({
       createdAt: Date.now(),
       userName: authUser.name || "Anonymous User",
     };
-    if (args.comment !== undefined) payload.comment = args.comment;
-    if (authUser.image !== undefined) payload.userImage = authUser.image;
+    if (args.comment !== undefined) payload["comment"] = args.comment;
+    if (authUser.image !== undefined) payload["userImage"] = authUser.image;
 
     const reviewId = await ctx.db.insert("reviews", payload);
 
@@ -110,25 +110,25 @@ export const create = mutation({
 
 export const getUserReviews = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx: any) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", identity.subject))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", identity.subject))
       .first();
 
     if (!user) return [];
 
     const reviews = await ctx.db
       .query("reviews")
-      .filter((q) => q.eq(q.field("userId"), user._id))
+      .filter((q: any) => q.eq(q.field("userId"), user._id))
       .order("desc")
       .collect();
 
     const hydrated = await Promise.all(
-      reviews.map(async (review) => {
+      reviews.map(async (review: any) => {
         const property = await ctx.db.get(review.propertyId);
         if (!property) return null;
 
@@ -145,7 +145,7 @@ export const getUserReviews = query({
 
 export const getOwnerReviews = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx: any) => {
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
@@ -158,24 +158,24 @@ export const getOwnerReviews = query({
 
     const owner = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
 
     if (!owner) return [];
 
     const properties = await ctx.db
       .query("properties")
-      .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
+      .withIndex("by_ownerId", (q: any) => q.eq("ownerId", owner._id))
       .collect();
 
     const allReviews = await Promise.all(
-      properties.map(async (p) => {
+      properties.map(async (p: any) => {
         const reviews = await ctx.db
           .query("reviews")
-          .withIndex("by_propertyId", (q) => q.eq("propertyId", p._id))
+          .withIndex("by_propertyId", (q: any) => q.eq("propertyId", p._id))
           .collect();
         
-        return reviews.map(r => ({
+        return reviews.map((r: any) => ({
           ...r,
           propertyName: p.name,
           status: r.status || "Published",
@@ -183,13 +183,13 @@ export const getOwnerReviews = query({
       })
     );
 
-    return allReviews.flat().sort((a, b) => b.createdAt - a.createdAt);
+    return allReviews.flat().sort((a: any, b: any) => b.createdAt - a.createdAt);
   },
 });
 
 export const replyToReview = mutation({
   args: { reviewId: v.id("reviews"), reply: v.string() },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const authUser = await authComponent.getAuthUser(ctx);
     if (!authUser) throw new Error("Unauthorized");
 
@@ -199,7 +199,7 @@ export const replyToReview = mutation({
 
     const profile = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
     if (!profile) throw new Error("Profile not found");
 
@@ -229,13 +229,13 @@ export const replyToReview = mutation({
 
 export const reportReview = mutation({
   args: { reviewId: v.id("reviews") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const authUser = await authComponent.getAuthUser(ctx);
     if (!authUser) throw new Error("Unauthorized");
 
     const profile = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
     if (!profile) throw new Error("Profile not found");
 
@@ -258,13 +258,13 @@ export const update = mutation({
     rating: v.number(),
     comment: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const authUser = await authComponent.getAuthUser(ctx);
     if (!authUser) throw new Error("Unauthorized");
 
     const profile = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
     if (!profile) throw new Error("Profile not found");
 
@@ -289,13 +289,13 @@ export const update = mutation({
 
 export const remove = mutation({
   args: { id: v.id("reviews") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const authUser = await authComponent.getAuthUser(ctx);
     if (!authUser) throw new Error("Unauthorized");
 
     const profile = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
     if (!profile) throw new Error("Profile not found");
 

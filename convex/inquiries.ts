@@ -10,7 +10,7 @@ async function requireUser(ctx: MutationCtx | QueryCtx) {
   if (!authUser) throw new Error("Unauthorized");
   const user = await ctx.db
     .query("users")
-    .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+    .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
     .first();
   if (!user) throw new Error("User not found");
   return user;
@@ -21,7 +21,7 @@ export const create = mutation({
     propertyId: v.id("properties"),
     message: v.optional(v.string())
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx: MutationCtx, args: { propertyId: any; message?: string }) => {
     const user = await requireUser(ctx);
     
     // Validate property exists
@@ -36,7 +36,7 @@ export const create = mutation({
     let convId;
     const existing = await ctx.db
       .query("conversations")
-      .withIndex("by_viewer_property", (q) => 
+      .withIndex("by_viewer_property", (q: any) => 
         q.eq("viewerId", user._id).eq("propertyId", args.propertyId)
       )
       .unique();
@@ -100,7 +100,7 @@ export const sendMessage = mutation({
     image: v.optional(v.id("_storage")),
     images: v.optional(v.array(v.id("_storage")))
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const user = await requireUser(ctx);
     
     if (!args.text && !args.image && (!args.images || args.images.length === 0)) {
@@ -128,9 +128,9 @@ export const sendMessage = mutation({
        isRead: false,
        createdAt: Date.now(),
     };
-    if (args.text !== undefined) payload.text = args.text;
-    if (args.image !== undefined) payload.image = args.image;
-    if (args.images !== undefined) payload.images = args.images;
+    if (args.text !== undefined) payload['text'] = args.text;
+    if (args.image !== undefined) payload['image'] = args.image;
+    if (args.images !== undefined) payload['images'] = args.images;
 
     const messageId = await ctx.db.insert("messages", payload);
 
@@ -161,7 +161,7 @@ export const sendMessage = mutation({
 
 export const getMessages = query({
   args: { conversationId: v.id("conversations") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
@@ -173,7 +173,7 @@ export const getMessages = query({
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .first();
     const localUserId = user?._id;
 
@@ -193,19 +193,19 @@ export const getMessages = query({
 
     let visibleMsgs = msgs;
     if (cutoff) {
-       visibleMsgs = msgs.filter(m => m._creationTime >= cutoff);
+       visibleMsgs = (msgs as any[]).filter((m: any) => m._creationTime >= cutoff);
     }
 
     // Cap at 100 for display
     const paginated = visibleMsgs.slice(0, 100);
 
     // Format them
-    const formatted = await Promise.all(paginated.map(async (m) => {
+    const formatted = await Promise.all(paginated.map(async (m: any) => {
        let imageUrl = undefined;
        if (m.image) {
           imageUrl = await ctx.storage.getUrl(m.image);
        }
-       const imageUrls = m.images ? await Promise.all(m.images.map(id => ctx.storage.getUrl(id))) : [];
+       const imageUrls = m.images ? await Promise.all(m.images.map((id: any) => ctx.storage.getUrl(id))) : [];
 
        return {
          id: m._id,
@@ -226,7 +226,7 @@ export const getMessages = query({
 
 export const deleteConversation = mutation({
   args: { conversationId: v.id("conversations") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const user = await requireUser(ctx);
     const conversation = await ctx.db.get(args.conversationId);
     if (!conversation) throw new Error("Conversation not found");
@@ -251,7 +251,7 @@ export const deleteConversation = mutation({
     if (updated?.viewerDeleted && updated?.ownerDeleted) {
        const msgs = await ctx.db
          .query("messages")
-         .withIndex("by_conversation", q => q.eq("conversationId", args.conversationId))
+         .withIndex("by_conversation", (q: any) => q.eq("conversationId", args.conversationId))
          .collect();
 
        // Phase 1: Collect storage IDs before deleting records
@@ -281,14 +281,14 @@ export const deleteConversation = mutation({
 
 export const markAsRead = mutation({
   args: { conversationId: v.id("conversations") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: MutationCtx, args: { conversationId: Id<"conversations"> }) => {
     const user = await requireUser(ctx);
 
     // DI-013: Bounded processing for long conversations
     const msgs = await ctx.db
       .query("messages")
-      .withIndex("by_conversation", q => q.eq("conversationId", args.conversationId))
-      .filter(q => q.and(
+      .withIndex("by_conversation", (q: any) => q.eq("conversationId", args.conversationId))
+      .filter((q: any) => q.and(
         q.eq(q.field("isRead"), false),
         q.neq(q.field("senderId"), user._id)
       ))
@@ -302,7 +302,7 @@ export const markAsRead = mutation({
 
 export const getUserConversations = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx: QueryCtx) => {
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
@@ -314,7 +314,7 @@ export const getUserConversations = query({
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .first();
 
     if (!user) return [];
@@ -325,28 +325,28 @@ export const getUserConversations = query({
     if (user.role === "viewer") {
        conversations = await ctx.db
          .query("conversations")
-         .withIndex("by_viewer", q => q.eq("viewerId", user._id))
+         .withIndex("by_viewer", (q: any) => q.eq("viewerId", user._id))
          .collect();
     } else if (user.role === "owner") {
        conversations = await ctx.db
          .query("conversations")
-         .withIndex("by_owner", q => q.eq("ownerId", user._id))
+         .withIndex("by_owner", (q: any) => q.eq("ownerId", user._id))
          .collect();
     }
 
     // Resolve property and peer references
     // Peer = owner if role is viewer, viewer if role is owner
     const hydrated = await Promise.all(
-       conversations.map(async (conv) => {
+       conversations.map(async (conv: any) => {
           if (user.role === "viewer" && conv.viewerDeleted) return null;
           if (user.role === "owner" && conv.ownerDeleted) return null;
 
-          const property = await ctx.db.get(conv.propertyId);
+          const property: any = await ctx.db.get(conv.propertyId);
           if (!property) return null;
           
           let prices = [0];
           if (property.rooms && property.rooms.length > 0) {
-            prices = property.rooms.map(r => r.price);
+            prices = property.rooms.map((r: any) => r.price);
           }
           const priceMin = Math.min(...prices);
 
@@ -364,7 +364,7 @@ export const getUserConversations = query({
           if (conv.lastMessageId) {
              const lastMsg = await ctx.db.get(conv.lastMessageId);
              if (lastMsg) {
-               lastMessageText = lastMsg.text || "Sent an image";
+               lastMessageText = (lastMsg as any)?.text || "No messages yet";
                lastMessageTime = lastMsg._creationTime;
              }
           }
@@ -375,12 +375,12 @@ export const getUserConversations = query({
           // RES-H05: Bound unread count query
           let unreadMsgs = await ctx.db
             .query("messages")
-            .withIndex("by_conversation", q => q.eq("conversationId", conv._id))
-            .filter(q => q.and(q.eq(q.field("isRead"), false), q.neq(q.field("senderId"), user._id)))
+            .withIndex("by_conversation", (q: any) => q.eq("conversationId", conv._id))
+            .filter((q: any) => q.and(q.eq(q.field("isRead"), false), q.neq(q.field("senderId"), user._id)))
             .take(100);
 
           if (cutoff) {
-             unreadMsgs = unreadMsgs.filter(m => m._creationTime >= cutoff);
+             unreadMsgs = unreadMsgs.filter((m: any) => m._creationTime >= cutoff);
           }
 
           return {
@@ -396,8 +396,8 @@ export const getUserConversations = query({
              },
              peer: {
                 id: peerId,
-                name: peer?.name || (user.role === "viewer" ? "Property Owner" : "Viewer"),
-                image: peer?.image,
+                name: (peer as any)?.name || (user.role === "viewer" ? "Property Owner" : "Viewer"),
+                image: (peer as any)?.image,
              },
              lastMessageText,
              lastMessageTime,
@@ -407,6 +407,6 @@ export const getUserConversations = query({
        })
     );
 
-    return hydrated.filter(Boolean).sort((a,b) => (b!.updatedAt - a!.updatedAt));
+    return hydrated.filter(Boolean).sort((a: any, b: any) => (b!.updatedAt - a!.updatedAt));
   },
 });

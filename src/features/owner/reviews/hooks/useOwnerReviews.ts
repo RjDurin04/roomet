@@ -48,10 +48,10 @@ export function useOwnerReviews(targetReviewId?: string | null) {
   const stats = useMemo(() => {
     if (!mappedReviews.length) return { total: 0, average: 0, pending: 0, topRated: 0, unreplied: 0, trend: 0 };
     const total = mappedReviews.length;
-    const average = mappedReviews.reduce((acc, r) => acc + r.rating, 0) / total;
-    const unreplied = mappedReviews.filter(r => r.status === 'pending').length;
+    const average = mappedReviews.reduce((acc: any, r: any) => acc + r.rating, 0) / total;
+    const unreplied = mappedReviews.filter((r: any) => r.status === 'pending').length;
     const MIN_TOP_RATING = 4;
-    const topRated = mappedReviews.filter(r => r.rating >= MIN_TOP_RATING).length;
+    const topRated = mappedReviews.filter((r: any) => r.rating >= MIN_TOP_RATING).length;
     return { 
       total, 
       average: Number(average.toFixed(1)), 
@@ -63,10 +63,10 @@ export function useOwnerReviews(targetReviewId?: string | null) {
   }, [mappedReviews]);
 
   const filteredReviews = useMemo(() => {
-    let result = filter === 'all' ? mappedReviews : mappedReviews.filter(r => r.status === filter);
+    let result = filter === 'all' ? mappedReviews : mappedReviews.filter((r: any) => r.status === filter);
     
     if (targetReviewId) {
-      result = [...result].sort((a, b) => {
+      result = [...result].sort((a: any, b: any) => {
         if (a.id === targetReviewId) return -1;
         if (b.id === targetReviewId) return 1;
         return 0;

@@ -49,12 +49,12 @@ export function ExplorerFilters({
          <div>
            <label className="text-[12px] font-medium text-muted-foreground mb-1.5 block">Amenities</label>
            <div className="flex flex-wrap gap-1.5">
-             {allAmenities.map(a => {
+             {allAmenities.map((a: any) => {
                const isOn = selectedAmenities.includes(a);
                return (
                  <button
                    key={a}
-                   onClick={() => { setSelectedAmenities(prev => isOn ? prev.filter(x => x !== a) : [...prev, a]); }}
+                   onClick={() => { setSelectedAmenities(prev => isOn ? prev.filter((x: any) => x !== a) : [...prev, a]); }}
                    className={`px-2.5 py-1 rounded-full text-[10px] font-medium border transition-colors ${isOn ? 'bg-primary/10 border-primary/30 text-primary' : 'border-border/50 text-muted-foreground hover:text-foreground hover:border-border'}`}
                  >
                    {isOn && <Check className="inline w-2.5 h-2.5 mr-0.5" />}{a}

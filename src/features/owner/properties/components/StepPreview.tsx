@@ -41,7 +41,7 @@ export function StepPreview({ formData, images }: StepPreviewProps) {
           <PreviewSection number="02" title="Gallery">
             <div className="bg-card border border-border/50 rounded-[28px] md:rounded-[32px] p-4 md:p-6 shadow-sm overflow-hidden">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {images.map((img, idx) => (
+                {images.map((img: any, idx: any) => (
                   <div key={idx} className="aspect-square rounded-2xl overflow-hidden border border-border/20 group/img relative">
                     <img src={img.url} className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110" alt={`Preview ${idx + 1}`} />
                   </div>
@@ -58,7 +58,7 @@ export function StepPreview({ formData, images }: StepPreviewProps) {
           {/* 03: Inventory/Units */}
           <PreviewSection number="03" title="Inventory">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {formData.rooms.map((room) => (
+              {formData.rooms.map((room: any) => (
                 <div key={room.id} className="p-6 rounded-[28px] bg-card border border-border/50 flex flex-col gap-5 group/item hover:border-primary/40 transition-all shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -89,7 +89,7 @@ export function StepPreview({ formData, images }: StepPreviewProps) {
 
                   {room.amenities.length > 0 && (
                     <div className="flex flex-wrap gap-x-3 gap-y-1.5 pt-3 border-t border-border/40">
-                      {room.amenities.map((amenity, idx) => (
+                      {room.amenities.map((amenity: any, idx: any) => (
                         <span key={idx} className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-tight flex items-center gap-1">
                           <div className="w-1 h-1 bg-primary/40 rounded-full" /> {amenity}
                         </span>
@@ -152,7 +152,7 @@ export function StepPreview({ formData, images }: StepPreviewProps) {
                     <h4 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground italic">Property Features</h4>
                  </div>
                  <div className="flex flex-wrap gap-2">
-                    {formData.amenities.map((amenity, idx) => (
+                    {formData.amenities.map((amenity: any, idx: any) => (
                       <span key={idx} className="px-3 py-1 bg-primary/10 text-primary rounded-lg text-[9px] font-black uppercase tracking-widest border border-primary/20">
                         {amenity}
                       </span>

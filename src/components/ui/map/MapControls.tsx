@@ -19,7 +19,7 @@ export function MapControls({ children, className }: { children: React.ReactNode
 
 export function ZoomControl() {
   const { map } = useMap();
-  const [zoom, setZoom] = useState(UI_CONSTANTS.MAP_DEFAULT_ZOOM);
+  const [zoom, setZoom] = useState<number>(UI_CONSTANTS.MAP_DEFAULT_ZOOM);
 
   useEffect(() => {
     if (!map) return;

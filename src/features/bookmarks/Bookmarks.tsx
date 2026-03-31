@@ -75,7 +75,7 @@ export function Bookmarks() {
         {viewMode === 'grid' && items.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <AnimatePresence>
-              {items.map((bh, i) => (
+              {items.map((bh: any, i: any) => (
                 <motion.div 
                   key={bh.id}
                   layout
@@ -147,7 +147,7 @@ export function Bookmarks() {
         {viewMode === 'list' && items.length > 0 && (
           <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
             <AnimatePresence>
-              {items.map((bh, _i) => (
+              {items.map((bh: any, _i: any) => (
                 <motion.div
                   key={bh.id}
                   layout

@@ -30,7 +30,7 @@ export function RecentActivity({ recentInquiries }: RecentActivityProps) {
       <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
         <div className="space-y-1">
           {recentInquiries.length > 0 ? (
-            recentInquiries.map((inq) => (
+            recentInquiries.map((inq: any) => (
               <Link
                 key={inq.id}
                 to={`/owner/inquiries?id=${inq.id}`}

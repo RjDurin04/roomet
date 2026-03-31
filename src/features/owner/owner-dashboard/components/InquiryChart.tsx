@@ -13,7 +13,7 @@ interface InquiryChartProps {
 }
 
 export function InquiryChart({ monthlyTrends }: InquiryChartProps) {
-  const maxInquiries = Math.max(...monthlyTrends.map((t) => t.inquiries), 1);
+  const maxInquiries = Math.max(...monthlyTrends.map((t: any) => t.inquiries), 1);
 
   return (
     <div className="lg:col-span-7 space-y-4">
@@ -37,7 +37,7 @@ export function InquiryChart({ monthlyTrends }: InquiryChartProps) {
         </div>
         
         <div className="flex-1 flex items-end gap-2 md:gap-4 relative z-10 pb-2">
-          {monthlyTrends.map((trend, index) => {
+          {monthlyTrends.map((trend: any, index: any) => {
             const heightPercentage = Math.max(CHART_MIN_OPACITY, (trend.inquiries / maxInquiries) * PERCENT_BASE);
             return (
               <div key={trend.month} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">

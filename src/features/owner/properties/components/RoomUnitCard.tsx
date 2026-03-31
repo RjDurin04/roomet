@@ -23,7 +23,7 @@ interface RoomUnitCardProps {
  
 export function RoomUnitCard({ room, idx, errors, onUpdate, onRemove }: RoomUnitCardProps) {
   const [isExpanded, setIsExpanded] = useState(true);
-  const roomErrors = Object.keys(errors).filter(key => key.startsWith(`rooms.${idx}.`));
+  const roomErrors = Object.keys(errors).filter((key: any) => key.startsWith(`rooms.${idx}.`));
   const hasErrors = roomErrors.length > 0;
    
   const nameError = errors[`rooms.${idx}.name`];

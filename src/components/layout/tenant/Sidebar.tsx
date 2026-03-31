@@ -28,7 +28,7 @@ export function SidebarTenant() {
 
   const inquiries = useQuery(api.inquiries.getUserConversations);
   const unreadInquiriesCount = inquiries 
-    ? inquiries.reduce((acc, inq) => acc + ((inq?.unreadCount ?? 0) > 0 ? 1 : 0), 0)
+    ? inquiries.reduce((acc: any, inq: any) => acc + ((inq?.unreadCount ?? 0) > 0 ? 1 : 0), 0)
     : 0;
 
   const nav = NAV_ITEMS;
@@ -36,7 +36,7 @@ export function SidebarTenant() {
   const notificationsData = useQuery(api.notifications.get);
   const markAsRead = useMutation(api.notifications.markAsRead);
   const notifications = notificationsData ?? [];
-  const unreadNotificationsCount = notifications.filter(n => !n.isRead).length;
+  const unreadNotificationsCount = notifications.filter((n: any) => !n.isRead).length;
 
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -55,7 +55,7 @@ export function SidebarTenant() {
       </Link>
       
       <nav className="flex flex-row md:flex-col items-center gap-1 md:gap-3 w-auto md:w-full px-1 md:px-3">
-        {nav.map((item) => {
+        {nav.map((item: any) => {
           const isActive = location.pathname === item.path || (location.pathname.startsWith('/tenant/map/roomet') && item.path === '/tenant/map');
           const Icon = item.icon;
           const hasBadge = item.name === 'Inbox' && unreadInquiriesCount > 0;
@@ -145,7 +145,7 @@ export function SidebarTenant() {
               )}
             </div>
             <div className="max-h-[min(400px,70vh)] overflow-y-auto">
-              {notifications.length > 0 ? notifications.map(n => (
+              {notifications.length > 0 ? notifications.map((n: any) => (
                 <div 
                   key={n._id} 
                   onClick={() => {

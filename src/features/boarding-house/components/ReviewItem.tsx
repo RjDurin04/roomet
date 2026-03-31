@@ -14,7 +14,7 @@ interface ReviewItemProps {
     comment?: string;
     reply?: string;
   };
-  currentUserProfileId?: string;
+  currentUserProfileId?: string | undefined;
   isTarget: boolean;
   isEditing: boolean;
   onEdit: () => void;
@@ -109,7 +109,7 @@ export function ReviewItem({
       {isEditing ? (
         <div className="space-y-4 pt-1">
           <div className="flex items-center gap-1.5">
-            {RATING_STEPS.map((star) => (
+            {RATING_STEPS.map((star: any) => (
               <button
                 key={star}
                 onClick={() => setEditRating(star)}

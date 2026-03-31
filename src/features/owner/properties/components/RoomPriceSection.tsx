@@ -6,7 +6,7 @@ interface RoomPriceSectionProps {
   price: number;
   priceType: 'person' | 'room';
   onChange: (updates: { price?: number; priceType?: 'person' | 'room' }) => void;
-  error?: string;
+  error?: string | undefined | undefined;
 }
 
 export function RoomPriceSection({ price, priceType, onChange, error }: RoomPriceSectionProps) {
@@ -20,7 +20,7 @@ export function RoomPriceSection({ price, priceType, onChange, error }: RoomPric
           {[
             { id: 'person', label: '/ person', icon: Users },
             { id: 'room', label: '/ unit', icon: Info }
-          ].map(type => (
+          ].map((type: any) => (
             <button
               key={type.id}
               onClick={() => onChange({ priceType: type.id as 'person' | 'room' })}

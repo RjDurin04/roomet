@@ -42,14 +42,14 @@ export function OwnerInquiries() {
   // RES-C06: Clean up Object URLs on unmount
   useEffect(() => {
     return () => {
-      selectedFiles.forEach(f => URL.revokeObjectURL(f.previewUrl));
+      selectedFiles.forEach((f: any) => URL.revokeObjectURL(f.previewUrl));
     };
   }, [selectedFiles]);
 
   // RES-H07: Debounced mark-as-read to prevent mutation storms
   useEffect(() => {
     if (!activeId || !messages) return;
-    const hasUnread = messages.some(m => !m.isMine && !m.isRead);
+    const hasUnread = messages.some((m: any) => !m.isMine && !m.isRead);
     if (!hasUnread) return;
     if (lastMarkedRef.current === activeId) return;
     lastMarkedRef.current = activeId;
@@ -74,12 +74,12 @@ export function OwnerInquiries() {
      return <div className="flex bg-background h-full items-center justify-center">Loading inquiries...</div>;
   }
 
-  const filteredInquiries = safeInquiries.filter(i => 
+  const filteredInquiries = safeInquiries.filter((i: any) => 
     i.peer.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     i.property.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const activeStrand = safeInquiries.find(i => i.id === activeId);
+  const activeStrand = safeInquiries.find((i: any) => i.id === activeId);
 
   const handleSend = async () => {
     if ((!replyText.trim() && selectedFiles.length === 0) || !activeId || isUploading) return;
@@ -103,13 +103,13 @@ export function OwnerInquiries() {
       }
 
       const payload: { conversationId: Id<"conversations">; text?: string; images?: Id<"_storage">[] } = { conversationId: activeId as Id<"conversations"> };
-      if (replyText.trim()) payload.text = replyText.trim();
-      if (storageIds.length > 0) payload.images = storageIds;
+      if (replyText.trim()) payload['text'] = replyText.trim();
+      if (storageIds.length > 0) payload['images'] = storageIds;
       await sendMessage(payload);
       
       setReplyText('');
       // SEC-010: Revoke all preview Object URLs before clearing
-      selectedFiles.forEach(f => URL.revokeObjectURL(f.previewUrl));
+      selectedFiles.forEach((f: any) => URL.revokeObjectURL(f.previewUrl));
       setSelectedFiles([]);
     } catch (error: unknown) {
       // RES-H06: Generic user-facing error, detailed log for debugging
@@ -141,7 +141,7 @@ export function OwnerInquiries() {
         </div>
 
         <div className="flex-1 overflow-y-auto w-full p-3 space-y-1 custom-scrollbar">
-          {filteredInquiries.map((inq) => {
+          {filteredInquiries.map((inq: any) => {
             const isActive = activeId === inq.id;
 
             return (
@@ -268,7 +268,7 @@ export function OwnerInquiries() {
             ) : messages.length === 0 ? (
                <div className="text-center py-8 text-sm font-medium text-muted-foreground border-2 border-dashed border-border rounded-xl">No messages yet. Reply to start the conversation!</div>
             ) : (
-               messages.map((msg, _idx) => {
+               messages.map((msg: any, _idx: any) => {
                  const isOwner = msg.isMine;
                  
                  return (
@@ -344,7 +344,7 @@ export function OwnerInquiries() {
                          return;
                        }
                        setSelectedFiles(prev => {
-                          const combined = [...prev, ...newFiles.map(file => ({ file, previewUrl: URL.createObjectURL(file) }))];
+                          const combined = [...prev, ...newFiles.map((file: any) => ({ file, previewUrl: URL.createObjectURL(file) }))];
                           if (combined.length > UPLOAD_LIMITS.MAX_CHAT_IMAGES) alert(`Maximum ${UPLOAD_LIMITS.MAX_CHAT_IMAGES} images allowed`);
                           return combined.slice(0, UPLOAD_LIMITS.MAX_CHAT_IMAGES);
                        });
@@ -355,10 +355,10 @@ export function OwnerInquiries() {
               />
               {selectedFiles.length > 0 && (
                  <div className="flex flex-wrap gap-2 px-1 pt-1">
-                    {selectedFiles.map((item, idx) => (
+                    {selectedFiles.map((item: any, idx: any) => (
                        <div key={idx} className="relative w-14 h-14 rounded-lg border border-border overflow-hidden shrink-0 group">
                           <img src={item.previewUrl} className="w-full h-full object-cover" />
-                          <button onClick={() => { URL.revokeObjectURL(item.previewUrl); setSelectedFiles(prev => prev.filter((_, i) => i !== idx)); }} className="absolute top-1 right-1 w-5 h-5 bg-background/80 text-foreground rounded-full flex items-center justify-center hover:bg-destructive hover:text-destructive-foreground transition-colors shadow-sm">
+                          <button onClick={() => { URL.revokeObjectURL(item.previewUrl); setSelectedFiles(prev => prev.filter((_: any, i: any) => i !== idx)); }} className="absolute top-1 right-1 w-5 h-5 bg-background/80 text-foreground rounded-full flex items-center justify-center hover:bg-destructive hover:text-destructive-foreground transition-colors shadow-sm">
                              <X className="w-3 h-3" />
                           </button>
                        </div>

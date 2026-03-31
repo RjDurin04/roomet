@@ -65,7 +65,7 @@ export function AddProperty() {
           <div className="h-20 md:h-28 flex flex-col justify-center gap-4">
             {/* Horizontal Stepper */}
             <div className="flex items-center justify-between w-full max-w-4xl mx-auto px-0 md:px-2">
-              {steps.map((step, index) => {
+              {steps.map((step: any, index: any) => {
                 const isActive = pf.currentStep === index;
                 const isCompleted = pf.currentStep > index;
                 const Icon = step.icon;

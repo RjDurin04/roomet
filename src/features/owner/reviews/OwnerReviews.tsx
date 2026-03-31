@@ -15,7 +15,7 @@ function StarRating({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'xs
   const w = size === 'xs' ? 'w-3 h-3' : 'w-3.5 h-3.5';
   return (
     <div className="flex items-center gap-0.5">
-      {[...Array(5)].map((_, i) => (
+      {[...Array(5)].map((_: any, i: any) => (
         <Star key={i} className={`${w} ${i < rating ? 'fill-amber-500 text-amber-500' : 'fill-muted text-muted'}`} />
       ))}
     </div>
@@ -127,7 +127,7 @@ export function OwnerReviews() {
 
             {/* Filter Tabs */}
             <div className="flex items-center bg-muted/40 p-1 rounded-xl border border-border/50 overflow-x-auto scrollbar-none">
-              {(['all', 'pending', 'replied'] as const).map((f) => (
+              {(['all', 'pending', 'replied'] as const).map((f: any) => (
                 <button
                   key={f}
                   onClick={() => handleFilterChange(f)}
@@ -159,7 +159,7 @@ export function OwnerReviews() {
 
           {/* Review Rows */}
           <div className="divide-y divide-border/30">
-            {pagedReviews.map((review) => {
+            {pagedReviews.map((review: any) => {
               const isExpanded = expandedId === review.id;
               const isTarget = targetId === review.id;
               const isReplying = or.replyingTo === review.id;

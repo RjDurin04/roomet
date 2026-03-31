@@ -43,7 +43,7 @@ export function ReviewForm({
             Rate this property
           </h3>
           <div className="flex items-center gap-2.5">
-            {RATING_STEPS.map((star) => (
+            {RATING_STEPS.map((star: any) => (
               <button
                 type="button"
                 key={star}

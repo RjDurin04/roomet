@@ -171,7 +171,7 @@ export function MapExplorer() {
     ])
   )).filter(Boolean).sort();
 
-  const houses: ExplorerHouse[] = properties.map(p => {
+  const houses: ExplorerHouse[] = properties.map((p: any) => {
     // DEF-008: Protective mapping against null/NaN values
     const safeRooms = p.rooms || [];
     const minPrice = safeRooms.length > 0 
@@ -182,8 +182,8 @@ export function MapExplorer() {
       (typeof r.occupied === 'number' ? r.occupied : 0) < (typeof r.capacity === 'number' ? r.capacity : 1)
     );
     
-    const centerLng = typeof viewport.center[0] === 'number' ? viewport.center[0] : 123.891;
-    const centerLat = typeof viewport.center[1] === 'number' ? viewport.center[1] : 10.3157;
+    const centerLng = typeof viewport['center'][0] === 'number' ? viewport['center'][0] : 123.891;
+    const centerLat = typeof viewport['center'][1] === 'number' ? viewport['center'][1] : 10.3157;
     
     const propLng = typeof p.location.lng === 'number' ? p.location.lng : 0;
     const propLat = typeof p.location.lat === 'number' ? p.location.lat : 0;
@@ -196,7 +196,7 @@ export function MapExplorer() {
       address: p.location.address || 'No address provided',
       coordinates: [propLng, propLat],
       price: minPrice,
-      images: (p.imageUrls || []).filter((u): u is string => u !== null),
+      images: (p.imageUrls || []).filter((u: any): u is string => u !== null),
       amenities: p.amenities || [],
       roomAmenities: safeRooms.flatMap((r: { amenities?: string[] }) => r.amenities ?? []),
       description: p.description || '',
@@ -208,7 +208,7 @@ export function MapExplorer() {
   });
 
   const filteredHouses = houses
-    .filter(bh => {
+    .filter((bh: any) => {
        if (mapBounds) {
          const [lng, lat] = bh.coordinates;
          if (lng < mapBounds.west || lng > mapBounds.east || lat < mapBounds.south || lat > mapBounds.north) {
@@ -217,14 +217,14 @@ export function MapExplorer() {
        }
        if (!isGeocoded && query && !bh.name.toLowerCase().includes(query.toLowerCase()) && !bh.address.toLowerCase().includes(query.toLowerCase())) return false;
        if (availabilityOnly && !bh.available) return false;
-       if (selectedAmenities.length > 0 && !selectedAmenities.every(a => {
+       if (selectedAmenities.length > 0 && !selectedAmenities.every((a: any) => {
            const hasProp = bh.amenities.some((ba: string) => ba.toLowerCase().includes(a.toLowerCase()));
            const hasRoom = bh.roomAmenities.some((ra: string) => ra.toLowerCase().includes(a.toLowerCase()));
            return hasProp || hasRoom;
        })) return false;
        return true;
     })
-    .sort((a, b) => {
+    .sort((a: any, b: any) => {
        if (sortMode === 'price-asc') return a.price - b.price;
        if (sortMode === 'price-desc') return b.price - a.price;
        if (sortMode === 'rating') return b.rating - a.rating;
@@ -237,7 +237,7 @@ export function MapExplorer() {
     <div className="flex flex-col md:flex-row w-full h-full relative">
       <ExplorerSidebar 
         query={query}
-        setQuery={(q) => { setQuery(q); if (q === '') setIsGeocoded(false); }}
+        setQuery={(q: any) => { setQuery(q); if (q === '') setIsGeocoded(false); }}
         isSearching={isSearching}
         onSearchSubmit={(e) => { void handleSearchSubmit(e); }}
         filteredHouses={filteredHouses}

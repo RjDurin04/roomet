@@ -4,7 +4,7 @@ import { authComponent } from "./auth";
 
 export const get = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx: any) => {
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
@@ -17,14 +17,14 @@ export const get = query({
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
 
     if (!user) return [];
 
     return await ctx.db
       .query("notifications")
-      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .withIndex("by_userId", (q: any) => q.eq("userId", user._id))
       .order("desc")
       .take(50);
   },
@@ -32,13 +32,13 @@ export const get = query({
 
 export const markAsRead = mutation({
   args: { notificationId: v.optional(v.id("notifications")) },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const authUser = await authComponent.getAuthUser(ctx);
     if (!authUser) throw new Error("Unauthorized");
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
 
     if (!user) throw new Error("User not found");
@@ -52,7 +52,7 @@ export const markAsRead = mutation({
       // Mark all as read
       const unread = await ctx.db
         .query("notifications")
-        .withIndex("by_userId_isRead", (q) => 
+        .withIndex("by_userId_isRead", (q: any) => 
           q.eq("userId", user._id).eq("isRead", false)
         )
         .collect();

@@ -22,7 +22,7 @@ const customStyles = {
   dark: "https://tiles.openfreemap.org/styles/bright"
 };
 
-export const ExplorerMap = forwardRef<unknown, ExplorerMapProps>(({
+export const ExplorerMap = forwardRef<any, ExplorerMapProps>(({
   viewport,
   onViewportChange,
   filteredHouses,
@@ -46,7 +46,7 @@ export const ExplorerMap = forwardRef<unknown, ExplorerMapProps>(({
           <FullscreenControl />
         </MapControls>
         
-        {filteredHouses.map((bh) => {
+        {filteredHouses.map((bh: any) => {
            const isActive = activeId === bh.id;
            const isHovered = hoveredId === bh.id;
            return (
@@ -92,7 +92,7 @@ export const ExplorerMap = forwardRef<unknown, ExplorerMapProps>(({
            <span className="font-bold text-foreground tabular-nums">{filteredHouses.length}</span> <span className="text-muted-foreground">visible</span>
          </div>
          <div className="bg-card/90 backdrop-blur-md border border-border rounded-lg px-3 py-2 shadow-lg text-[11px]">
-           <span className="text-muted-foreground">Avg</span> <span className="font-bold text-foreground tabular-nums">₱{filteredHouses.length > 0 ? Math.round(filteredHouses.reduce((s, b) => s + b.price, 0) / filteredHouses.length).toLocaleString() : 0}</span>
+           <span className="text-muted-foreground">Avg</span> <span className="font-bold text-foreground tabular-nums">₱{filteredHouses.length > 0 ? Math.round(filteredHouses.reduce((s: any, b: any) => s + b.price, 0) / filteredHouses.length).toLocaleString() : 0}</span>
          </div>
       </div>
     </div>

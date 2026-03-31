@@ -143,7 +143,7 @@ export function PropertyCard({
                     <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 px-2 italic">Select Revision Step</p>
                   </div>
                   <div className="p-1">
-                    {editSteps.map((step) => (
+                    {editSteps.map((step: any) => (
                       <button
                         key={step.id}
                         onClick={(e) => {

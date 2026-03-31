@@ -132,13 +132,13 @@ export const Map = forwardRef<MapRef, MapProps>(function Map(
     currentStyleRef.current = initialStyle;
 
     // Sanitize viewport
-    const sanitizedViewport: Record<string, unknown> = { ...viewport };
-    if (sanitizedViewport.center && Array.isArray(sanitizedViewport.center) && (sanitizedViewport.center[0] == null || sanitizedViewport.center[1] == null)) {
-      sanitizedViewport.center = [UI_CONSTANTS.CEBU_CENTER.lng, UI_CONSTANTS.CEBU_CENTER.lat];
+    const sanitizedViewport: Record<string, any> = { ...viewport };
+    if (sanitizedViewport['center'] && Array.isArray(sanitizedViewport['center']) && (sanitizedViewport['center'][0] == null || sanitizedViewport['center'][1] == null)) {
+      sanitizedViewport['center'] = [UI_CONSTANTS.CEBU_CENTER.lat, UI_CONSTANTS.CEBU_CENTER.lng];
     }
-    if (sanitizedViewport.zoom == null) delete sanitizedViewport.zoom;
-    if (sanitizedViewport.pitch == null) delete sanitizedViewport.pitch;
-    if (sanitizedViewport.bearing == null) delete sanitizedViewport.bearing;
+    if (sanitizedViewport['zoom'] == null) delete sanitizedViewport['zoom'];
+    if (sanitizedViewport['pitch'] == null) delete sanitizedViewport['pitch'];
+    if (sanitizedViewport['bearing'] == null) delete sanitizedViewport['bearing'];
 
     const map = new MapLibreGL.Map({
       container: containerRef.current,
@@ -186,15 +186,15 @@ export const Map = forwardRef<MapRef, MapProps>(function Map(
   useEffect(() => {
     if (!mapInstance || !isControlled || mapInstance.isMoving()) return;
     const current = getViewport(mapInstance);
-    const safeCenter: [number, number] = viewport.center 
-      ? [viewport.center[0], viewport.center[1]] 
+    const safeCenter: [number, number] = viewport['center'] 
+      ? [viewport['center'][0], viewport['center'][1]] 
       : current.center;
 
     const next = {
       center: safeCenter,
-      zoom: viewport.zoom ?? current.zoom,
-      bearing: viewport.bearing ?? current.bearing,
-      pitch: viewport.pitch ?? current.pitch,
+      zoom: viewport['zoom'] ?? current.zoom,
+      bearing: viewport['bearing'] ?? current.bearing,
+      pitch: viewport['pitch'] ?? current.pitch,
     };
     if (JSON.stringify(next) === JSON.stringify(current)) return;
     internalUpdateRef.current = true;

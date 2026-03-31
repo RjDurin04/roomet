@@ -119,7 +119,7 @@ export function ExplorerSidebar({
       </AnimatePresence>
 
       <div className="flex-1 overflow-y-auto modern-scrollbar">
-        {paginatedHouses.map((bh) => (
+        {paginatedHouses.map((bh: any) => (
           <ExplorerCard
             key={bh.id}
             bh={bh}

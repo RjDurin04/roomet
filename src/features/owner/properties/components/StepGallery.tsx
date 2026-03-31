@@ -18,7 +18,7 @@ export function StepGallery({ images, setImages, errors }: StepGalleryProps) {
     if (remainingSlots <= 0) return;
 
     const files = Array.from(e.target.files ?? []).slice(0, remainingSlots);
-    const newItems = files.map(file => ({
+    const newItems = files.map((file: any) => ({
       url: URL.createObjectURL(file),
       file
     }));
@@ -61,7 +61,7 @@ export function StepGallery({ images, setImages, errors }: StepGalleryProps) {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-        {images.map((img, idx) => (
+        {images.map((img: any, idx: any) => (
           <div key={idx} className="group relative aspect-square rounded-[24px] md:rounded-[32px] overflow-hidden border border-border/50 bg-muted/30">
             <img src={img.url} alt={`Gallery ${idx}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

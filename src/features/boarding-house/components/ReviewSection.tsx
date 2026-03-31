@@ -75,7 +75,7 @@ export function ReviewSection({
           {rating > 0 ? rating.toFixed(1) : "N/A"}
         </h2>
         <div className="flex items-center gap-1 text-amber-500 mb-1.5">
-          {RATING_STEPS.map((star) => (
+          {RATING_STEPS.map((star: any) => (
             <Star
               key={star}
               className={cn("w-3 h-3", star <= Math.round(rating) ? "fill-current" : "opacity-10")}
@@ -115,7 +115,7 @@ export function ReviewSection({
         {reviews.length === 0 ? (
           <ReviewEmptyState />
         ) : (
-          reviews.map((review) => (
+          reviews.map((review: any) => (
             <ReviewItem
               key={review._id}
               review={review}

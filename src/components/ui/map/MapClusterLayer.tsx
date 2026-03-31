@@ -37,7 +37,7 @@ export function MapClusterLayer({
 
     const geojson: GeoJSON.FeatureCollection<GeoJSON.Point> = {
       type: 'FeatureCollection',
-      features: points.map(p => ({
+      features: points.map((p: any) => ({
         type: 'Feature',
         properties: { ...p },
         geometry: {
@@ -48,7 +48,7 @@ export function MapClusterLayer({
     };
 
     if (map.getSource(sourceId)) {
-      (map.getSource(sourceId)).setData(geojson);
+      (map.getSource(sourceId) as any).setData(geojson);
     } else {
       map.addSource(sourceId, {
         type: 'geojson',
@@ -128,7 +128,7 @@ export function MapClusterLayer({
       const clusterId = feature.properties["cluster_id"];
 
       if (clusterId) {
-        const source = map.getSource(sourceId);
+        const source = map.getSource(sourceId) as any;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         source.getClusterExpansionZoom(clusterId, (err: any, zoom: number) => {
           if (err) return;

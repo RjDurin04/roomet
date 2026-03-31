@@ -31,7 +31,7 @@ export function TopPerformingProperties({ properties }: TopPerformingPropertiesP
 
       {properties.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-          {properties.map((bh) => (
+          {properties.map((bh: any) => (
             <div
               key={bh._id}
               onClick={() => { void navigate(`/owner/properties?id=${bh._id}`); }}

@@ -77,6 +77,7 @@ function useAuthSettled(isSessionLoading: boolean) {
       }, UI_CONSTANTS.AUTH_SETTLE_GRACE_MS);
       return () => clearTimeout(timer);
     }
+    return;
   }, [isSessionLoading]);
 
   // If currently loading and we've already settled once, remain settled

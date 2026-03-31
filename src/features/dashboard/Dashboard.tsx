@@ -47,7 +47,7 @@ export function Dashboard() {
   
   const unreadInquiriesCount = inquiries 
     .filter((inq): inq is NonNullable<typeof inq> => inq !== null)
-    .reduce((acc, inq) => acc + (inq.unreadCount > 0 ? 1 : 0), 0);
+    .reduce((acc: any, inq: any) => acc + (inq.unreadCount > 0 ? 1 : 0), 0);
 
   const stats = [
     { label: 'Bookmarks', value: bookmarks.length, icon: Bookmark, path: '/tenant/bookmarks' },
@@ -59,7 +59,7 @@ export function Dashboard() {
   const getMinPrice = (property: unknown) => {
     const p = property as { rooms?: { price: number }[] };
     if (!p.rooms || p.rooms.length === 0) return 0;
-    return Math.min(...p.rooms.map((r) => r.price));
+    return Math.min(...p.rooms.map((r: any) => r.price));
   };
 
   return (
@@ -74,7 +74,7 @@ export function Dashboard() {
             <p className="text-[13px] text-muted-foreground">You have {unreadInquiriesCount} unread replies in your inbox.</p>
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 lg:pb-0">
-            {stats.map(s => (
+            {stats.map((s: any) => (
               <button 
                 key={s.label} 
                 onClick={() => { if (s.path !== '#') void navigate(s.path); }}
@@ -199,7 +199,7 @@ export function Dashboard() {
               <AnimatePresence mode="wait">
                 {activeTab === 'inquiries' ? (
                   <motion.div key="inq" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="space-y-1">
-                    {inquiries.length > 0 ? inquiries.filter((inq): inq is NonNullable<typeof inq> => inq !== null).slice(0, MAX_INQUIRIES).map(inq => (
+                    {inquiries.length > 0 ? inquiries.filter((inq): inq is NonNullable<typeof inq> => inq !== null).slice(0, MAX_INQUIRIES).map((inq: any) => (
                       <div key={inq.id} onClick={() => { void navigate(`/tenant/inquiries?id=${inq.id}`); }} className="p-4 rounded-2xl hover:bg-muted/50 cursor-pointer transition-colors group">
                         <div className="flex justify-between items-start mb-1">
                           <p className="text-[13px] font-bold group-hover:text-primary transition-colors truncate pr-2">{inq.property.name}</p>
@@ -237,7 +237,7 @@ export function Dashboard() {
                         <div className="flex justify-between items-start z-10 relative">
                           <p className="text-[12px] font-bold pr-4 truncate group-hover:text-primary transition-colors">{r.propertyName}</p>
                           <div className="flex gap-0.5 text-amber-500 shrink-0">
-                            {Array.from({length: r.rating}).map((_, i) => <Star key={i} className="w-2.5 h-2.5 fill-current" />)}
+                            {Array.from({length: r.rating}).map((_: any, i: any) => <Star key={i} className="w-2.5 h-2.5 fill-current" />)}
                           </div>
                         </div>
                         <p className="text-[12px] text-muted-foreground line-clamp-2 z-10 relative italic">"{r.comment}"</p>

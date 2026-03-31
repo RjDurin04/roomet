@@ -12,7 +12,7 @@ async function getAuthenticatedProfile(ctx: MutationCtx | QueryCtx) {
 
   const profile = await ctx.db
     .query("users")
-    .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+    .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
     .unique();
 
   if (!profile) {
@@ -85,7 +85,7 @@ export const create = mutation({
       })
     ),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const profile = await getAuthenticatedProfile(ctx);
 
     if (profile.role !== "owner") {
@@ -109,10 +109,10 @@ export const create = mutation({
 
 export const listPublic = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx: any) => {
     const properties = await ctx.db
       .query("properties")
-      .filter((q) => 
+      .filter((q: any) => 
         q.or(
           q.eq(q.field("isVisible"), true),
           q.and(
@@ -124,23 +124,23 @@ export const listPublic = query({
       .collect();
 
     return Promise.all(
-      properties.map(async (property) => {
+      properties.map(async (property: any) => {
         const imageUrls = await Promise.all(
-          property.images.map(async (storageId) => {
+          property.images.map(async (storageId: any) => {
             return await ctx.storage.getUrl(storageId);
           })
         );
         
         const reviews = await ctx.db
           .query("reviews")
-          .withIndex("by_propertyId", (q) => q.eq("propertyId", property._id))
+          .withIndex("by_propertyId", (q: any) => q.eq("propertyId", property._id))
           .collect();
           
         let rating = 0;
         if (reviews.length > 0) {
-          const validReviews = reviews.filter(r => typeof r.rating === 'number' && !isNaN(r.rating));
+          const validReviews = reviews.filter((r: any) => typeof r.rating === 'number' && !isNaN(r.rating));
           if (validReviews.length > 0) {
-            rating = validReviews.reduce((sum, r) => sum + r.rating, 0) / validReviews.length;
+            rating = validReviews.reduce((sum: any, r: any) => sum + r.rating, 0) / validReviews.length;
           }
         }
         rating = Number(rating.toFixed(1));
@@ -153,7 +153,7 @@ export const listPublic = query({
             lat: typeof property.location.lat === 'number' ? property.location.lat : 10.3157, // Cebu fallback
             lng: typeof property.location.lng === 'number' ? property.location.lng : 123.891,
           },
-          rooms: property.rooms.map(room => ({
+          rooms: property.rooms.map((room: any) => ({
             ...room,
             price: typeof room.price === 'number' ? room.price : 0,
             capacity: typeof room.capacity === 'number' ? room.capacity : 1,
@@ -169,7 +169,7 @@ export const listPublic = query({
 
 export const listByOwner = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx: any) => {
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
@@ -184,22 +184,22 @@ export const listByOwner = query({
 
     const profile = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
 
     if (!profile) return [];
 
     const properties = await ctx.db
       .query("properties")
-      .withIndex("by_ownerId", (q) => q.eq("ownerId", profile._id))
+      .withIndex("by_ownerId", (q: any) => q.eq("ownerId", profile._id))
       .collect()
-      .then((props) => props.filter((p) => p.status !== "Deleted"));
+      .then((props: any) => props.filter((p: any) => p.status !== "Deleted"));
 
     // Map storage IDs to actual URLs
     return Promise.all(
-      properties.map(async (property) => {
+      properties.map(async (property: any) => {
         const imageUrls = await Promise.all(
-          property.images.map(async (storageId) => {
+          property.images.map(async (storageId: any) => {
             return await ctx.storage.getUrl(storageId);
           })
         );
@@ -211,7 +211,7 @@ export const listByOwner = query({
 
 export const toggleVisibility = mutation({
   args: { id: v.id("properties") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const profile = await getAuthenticatedProfile(ctx);
     const property = await ctx.db.get(args.id);
 
@@ -238,7 +238,7 @@ export const toggleVisibility = mutation({
 
 export const remove = mutation({
   args: { id: v.id("properties") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const profile = await getAuthenticatedProfile(ctx);
     const property = await ctx.db.get(args.id);
 
@@ -261,7 +261,7 @@ export const remove = mutation({
 
 export const listDeleted = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx: any) => {
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
@@ -275,21 +275,21 @@ export const listDeleted = query({
 
     const profile = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
 
     if (!profile) return [];
 
     const properties = await ctx.db
       .query("properties")
-      .withIndex("by_ownerId", (q) => q.eq("ownerId", profile._id))
+      .withIndex("by_ownerId", (q: any) => q.eq("ownerId", profile._id))
       .collect()
-      .then((props) => props.filter((p) => p.status === "Deleted"));
+      .then((props: any) => props.filter((p: any) => p.status === "Deleted"));
 
     return Promise.all(
-      properties.map(async (property) => {
+      properties.map(async (property: any) => {
         const imageUrls = await Promise.all(
-          property.images.map(async (storageId) => {
+          property.images.map(async (storageId: any) => {
             return await ctx.storage.getUrl(storageId);
           })
         );
@@ -301,7 +301,7 @@ export const listDeleted = query({
 
 export const restore = mutation({
   args: { id: v.id("properties") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const profile = await getAuthenticatedProfile(ctx);
     const property = await ctx.db.get(args.id);
 
@@ -334,24 +334,24 @@ export const generateUploadUrl = mutation(async (ctx) => {
 
 export const getById = query({
   args: { id: v.id("properties") },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const property = await ctx.db.get(args.id);
     if (!property) return null;
 
     const imageUrls = await Promise.all(
-      property.images.map(async (storageId) => {
+      property.images.map(async (storageId: any) => {
         return await ctx.storage.getUrl(storageId);
       })
     );
     
     const reviews = await ctx.db
       .query("reviews")
-      .withIndex("by_propertyId", (q) => q.eq("propertyId", property._id))
+      .withIndex("by_propertyId", (q: any) => q.eq("propertyId", property._id))
       .collect();
       
     let rating = 0;
     if (reviews.length > 0) {
-      rating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+      rating = reviews.reduce((sum: any, r: any) => sum + r.rating, 0) / reviews.length;
     }
     
     // DEF-008: Sanitize property data against null/NaN in numeric fields
@@ -362,7 +362,7 @@ export const getById = query({
         lat: typeof property.location.lat === 'number' ? property.location.lat : 10.3157, // Cebu fallback
         lng: typeof property.location.lng === 'number' ? property.location.lng : 123.891,
       },
-      rooms: property.rooms.map(room => ({
+      rooms: property.rooms.map((room: any) => ({
         ...room,
         price: typeof room.price === 'number' ? room.price : 0,
         capacity: typeof room.capacity === 'number' ? room.capacity : 1,
@@ -375,7 +375,7 @@ export const getById = query({
       imageUrls, 
       rating: Number(rating.toFixed(1)), 
       reviewsCount: reviews.length,
-      reviews: reviews.sort((a, b) => b.createdAt - a.createdAt)
+      reviews: reviews.sort((a: any, b: any) => b.createdAt - a.createdAt)
     };
   },
 });
@@ -412,7 +412,7 @@ export const update = mutation({
       })
     ),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx: any, args: any) => {
     const profile = await getAuthenticatedProfile(ctx);
     const existing = await ctx.db.get(args.id);
 

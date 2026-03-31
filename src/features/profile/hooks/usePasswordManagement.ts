@@ -27,7 +27,7 @@ export function usePasswordManagement(user: { id: string } | null | undefined) {
         const client = authClient as unknown as Client;
         if (typeof client.listAccounts === 'function') {
           const { data, error } = await client.listAccounts();
-          setHasCredentialAccount(!error && !!data?.some(acc => acc.providerId === 'credential'));
+          setHasCredentialAccount(!error && !!data?.some((acc: any) => acc.providerId === 'credential'));
         } else {
           setHasCredentialAccount(false);
         }
@@ -43,13 +43,13 @@ export function usePasswordManagement(user: { id: string } | null | undefined) {
     const client = authClient as unknown as Client;
     if (!hasCredentialAccount) {
       const { error } = await client.setPassword({ newPassword });
-      if (error) return setPassError(error.message);
+      if (error) return setPassError(error.message ?? 'Failed to set password');
       setPassSuccess('Password set successfully');
       setNewPassword(''); setConfirmPassword(''); setHasCredentialAccount(true);
     } else {
       if (!currentPassword) return setPassError('Current password is required');
       const { error } = await authClient.changePassword({ newPassword, currentPassword, revokeOtherSessions: true });
-      if (error) return setPassError(error.code === 'INVALID_PASSWORD' ? 'Invalid current password.' : error.message);
+      if (error) return setPassError(error.code === 'INVALID_PASSWORD' ? 'Invalid current password.' : (error.message ?? 'Failed to update password'));
       setPassSuccess('Password updated successfully');
       setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
     }

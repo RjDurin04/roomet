@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import React from "react";
 
 import { BrandHeader } from "./components/BrandHeader";
 import { LoginForm } from "./components/LoginForm";
@@ -65,7 +64,7 @@ function BackgroundElements() {
 function ModeSwitcher({ mode, setMode, setError }: { mode: 'signin' | 'signup', setMode: (m: 'signin' | 'signup') => void, setError: (e: string | null) => void }) {
   return (
     <div className="flex border-b border-border/50">
-      {(['signin', 'signup'] as const).map((tab) => (
+      {(['signin', 'signup'] as const).map((tab: any) => (
         <button
           key={tab} onClick={() => { setMode(tab); setError(null); }}
           className={`flex-1 py-3.5 text-[13px] font-bold uppercase tracking-wider transition-all relative ${mode === tab ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}

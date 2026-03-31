@@ -1,18 +1,17 @@
-import { v } from "convex/values";
-import { mutation } from "./_generated/server";
+import { mutation, type MutationCtx } from "./_generated/server";
 import { authComponent } from "./auth";
 
 // Data repair mutation to fix schema violations (nulls where numbers are expected)
 // RES-H03: Ensures data integrity for properties and rooms
 export const repairData = mutation({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx: MutationCtx) => {
     const authUser = await authComponent.getAuthUser(ctx);
     if (!authUser) throw new Error("Not authenticated");
     
     const profile = await ctx.db
       .query("users")
-      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
       .unique();
       
     if (!profile || profile.role !== "owner") {
@@ -38,7 +37,7 @@ export const repairData = mutation({
 
       // Fix rooms
       if (property.rooms && Array.isArray(property.rooms)) {
-        const fixedRooms = property.rooms.map(room => {
+        const fixedRooms = property.rooms.map((room: any) => {
           let roomNeedsFix = false;
           const newRoom = { ...room };
           

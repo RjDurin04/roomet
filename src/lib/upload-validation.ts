@@ -27,7 +27,7 @@ export function validateImageFile(
   file: File,
   maxSize: number = UI_CONSTANTS.MAX_FILE_SIZE
 ): string | null {
-  if (!UI_CONSTANTS.ALLOWED_IMAGE_TYPES.includes(file.type)) {
+  if (!(UI_CONSTANTS.ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type)) {
     return `Invalid file type: "${file.name}". Allowed: JPEG, PNG, WebP.`;
   }
   if (file.size > maxSize) {
@@ -46,6 +46,6 @@ export function validateImageFiles(
   maxSize: number = UI_CONSTANTS.MAX_FILE_SIZE
 ): string[] {
   return files
-    .map((f) => validateImageFile(f, maxSize))
+    .map((f: any) => validateImageFile(f, maxSize))
     .filter((err): err is string => err !== null);
 }

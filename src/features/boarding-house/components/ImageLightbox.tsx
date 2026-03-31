@@ -73,7 +73,7 @@ export function ImageLightbox({
             </button>
           </div>
           <div className="absolute bottom-10 flex items-center gap-3">
-            {images.length > 1 && images.map((_, idx) => (
+            {images.length > 1 && images.map((_: any, idx: any) => (
               <div
                 key={idx}
                 className={cn(

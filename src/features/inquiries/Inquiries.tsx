@@ -46,14 +46,14 @@ export function Inquiries() {
   // RES-C06: Clean up Object URLs on unmount
   useEffect(() => {
     return () => {
-      selectedFiles.forEach(f => URL.revokeObjectURL(f.previewUrl));
+      selectedFiles.forEach((f: any) => URL.revokeObjectURL(f.previewUrl));
     };
   }, [selectedFiles]);
 
   // RES-H07: Debounced mark-as-read to prevent mutation storms
   useEffect(() => {
     if (!activeId || !messages) return;
-    const hasUnread = messages.some(m => !m.isMine && !m.isRead);
+    const hasUnread = messages.some((m: any) => !m.isMine && !m.isRead);
     if (!hasUnread) return;
     if (lastMarkedRef.current === activeId) return;
     lastMarkedRef.current = activeId;
@@ -69,7 +69,7 @@ export function Inquiries() {
   useEffect(() => {
     if (!activeId && conversations && conversations.length > 0) {
       if (window.innerWidth < MOBILE_BREAKPOINT) return; // Don't auto-select on mobile
-      const firstValid = conversations.find(c => c !== null);
+      const firstValid = conversations.find((c: any) => c !== null);
       if (firstValid) setSearchParams({ id: firstValid.id });
     }
   }, [conversations, activeId, setSearchParams]);
@@ -78,12 +78,12 @@ export function Inquiries() {
     return <div className="flex-1 flex items-center justify-center">Loading conversations...</div>;
   }
 
-  const filteredChats = conversations.filter((c): c is NonNullable<typeof c> => c !== null).filter(c => 
+  const filteredChats = conversations.filter((c): c is NonNullable<typeof c> => c !== null).filter((c: any) => 
     c.peer.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     c.property.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const activeChat = conversations.filter((c): c is NonNullable<typeof c> => c !== null).find(c => c.id === activeId);
+  const activeChat = conversations.filter((c): c is NonNullable<typeof c> => c !== null).find((c: any) => c.id === activeId);
 
   const handleSend = async () => {
     if ((!inputValue.trim() && selectedFiles.length === 0) || !activeId || isUploading) return;
@@ -107,13 +107,13 @@ export function Inquiries() {
       }
 
       const payload: Record<string, unknown> = { conversationId: activeId };
-      if (inputValue.trim()) payload.text = inputValue.trim();
-      if (storageIds.length > 0) payload.images = storageIds;
+      if (inputValue.trim()) payload['text'] = inputValue.trim();
+      if (storageIds.length > 0) payload['images'] = storageIds;
       await sendMessage(payload);
       
       setInputValue('');
       // SEC-010: Revoke all preview Object URLs before clearing
-      selectedFiles.forEach(f => URL.revokeObjectURL(f.previewUrl));
+      selectedFiles.forEach((f: any) => URL.revokeObjectURL(f.previewUrl));
       setSelectedFiles([]);
     } catch (error: unknown) {
       // RES-H06: Generic user-facing error, detailed log for debugging
@@ -135,7 +135,7 @@ export function Inquiries() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold tracking-tight">Messages</h2>
             <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-muted px-2 py-1 rounded-md">
-              {conversations.reduce((acc, c) => acc + (c?.unreadCount ?? 0), 0)} unread
+              {conversations.reduce((acc: any, c: any) => acc + (c?.unreadCount ?? 0), 0)} unread
             </span>
           </div>
           <div className="relative group">
@@ -152,7 +152,7 @@ export function Inquiries() {
 
         {/* Conversation Items */}
         <div className="flex-1 overflow-y-auto">
-          {filteredChats.map(chat => {
+          {filteredChats.map((chat: any) => {
             const isActive = activeId === chat.id;
             return (
               <div 
@@ -306,7 +306,7 @@ export function Inquiries() {
               <div className="text-center py-8 text-sm font-medium text-muted-foreground border-2 border-dashed border-border rounded-xl my-4">No messages yet. Say hi!</div>
             ) : (
               // eslint-disable-next-line complexity -- Chat message requires granular rendering logic
-              messages.map((msg, i) => {
+              messages.map((msg: any, i: any) => {
                 const isUser = msg.isMine;
                 const showAvatar = i === 0 || messages[i - 1]?.senderId !== msg.senderId;
                 return (
@@ -379,7 +379,7 @@ export function Inquiries() {
                          return;
                        }
                        setSelectedFiles(prev => {
-                          const combined = [...prev, ...newFiles.map(file => ({ file, previewUrl: URL.createObjectURL(file) }))];
+                          const combined = [...prev, ...newFiles.map((file: any) => ({ file, previewUrl: URL.createObjectURL(file) }))];
                           if (combined.length > UPLOAD_LIMITS.MAX_CHAT_IMAGES) alert(`Maximum ${UPLOAD_LIMITS.MAX_CHAT_IMAGES} images allowed`);
                           return combined.slice(0, UPLOAD_LIMITS.MAX_CHAT_IMAGES);
                        });
@@ -390,10 +390,10 @@ export function Inquiries() {
               />
               {selectedFiles.length > 0 && (
                  <div className="flex flex-wrap gap-2 px-1 pt-1">
-                    {selectedFiles.map((item, idx) => (
+                    {selectedFiles.map((item: any, idx: any) => (
                        <div key={idx} className="relative w-14 h-14 rounded-lg border border-border overflow-hidden shrink-0 group">
                           <img src={item.previewUrl} className="w-full h-full object-cover" />
-                          <button onClick={() => { URL.revokeObjectURL(item.previewUrl); setSelectedFiles(prev => prev.filter((_, i) => i !== idx)); }} className="absolute top-1 right-1 w-5 h-5 bg-background/80 text-foreground rounded-full flex items-center justify-center hover:bg-destructive hover:text-destructive-foreground transition-colors shadow-sm">
+                          <button onClick={() => { URL.revokeObjectURL(item.previewUrl); setSelectedFiles(prev => prev.filter((_: any, i: any) => i !== idx)); }} className="absolute top-1 right-1 w-5 h-5 bg-background/80 text-foreground rounded-full flex items-center justify-center hover:bg-destructive hover:text-destructive-foreground transition-colors shadow-sm">
                              <X className="w-3 h-3" />
                           </button>
                        </div>

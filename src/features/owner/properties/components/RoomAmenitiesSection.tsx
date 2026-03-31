@@ -19,7 +19,7 @@ export function RoomAmenitiesSection({ amenities, onChange }: RoomAmenitiesSecti
   };
 
   const removeAmenity = (index: number) => {
-    onChange(amenities.filter((_, i) => i !== index));
+    onChange(amenities.filter((_: any, i: any) => i !== index));
   };
 
   return (
@@ -46,7 +46,7 @@ export function RoomAmenitiesSection({ amenities, onChange }: RoomAmenitiesSecti
       </div>
 
       <div className="flex flex-wrap gap-2 mt-4">
-        {amenities.map((amenity, idx) => (
+        {amenities.map((amenity: any, idx: any) => (
           <span 
             key={idx}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-bold border border-primary/20"

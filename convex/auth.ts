@@ -3,7 +3,7 @@ import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex, crossDomain } from "@convex-dev/better-auth/plugins";
 import { components } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
-import { query } from "./_generated/server";
+import { query, type QueryCtx } from "./_generated/server";
 import { betterAuth } from "better-auth";
 import { createAuthEndpoint, sessionMiddleware } from "better-auth/api";
 import { z } from "zod";
@@ -66,7 +66,7 @@ const customSetPasswordPlugin = {
       const passwordHash = await ctx.context.password.hash(newPassword);
       const accounts = await ctx.context.internalAdapter.findAccounts(session.user.id);
       
-      const hasCredential = accounts.some((a: { providerId: string; password?: string }) => a.providerId === "credential" && a.password);
+      const hasCredential = accounts.some((a: any) => a.providerId === "credential" && !!a.password);
       if (hasCredential) {
         return new Response(JSON.stringify({ message: "Password already set" }), { status: 400 });
       }
@@ -137,7 +137,7 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
 // Get the currently authenticated user
 export const getCurrentUser = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx: QueryCtx) => {
     return authComponent.getAuthUser(ctx);
   },
 });

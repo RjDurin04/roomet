@@ -48,7 +48,7 @@ export function ExplorerCard({ bh, isActive, isHovered, onMouseEnter, onMouseLea
             <span className="text-[10px] text-muted-foreground font-medium"> /mo</span>
           </div>
           <div className="flex items-center gap-1.5">
-            {bh.amenities.slice(0, 2).map(a => (
+            {bh.amenities.slice(0, 2).map((a: any) => (
               <span key={a} className="bg-muted text-muted-foreground text-[9px] font-medium px-1.5 py-0.5 rounded capitalize">{a.split(' ')[0]}</span>
             ))}
           </div>
