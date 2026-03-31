@@ -1,9 +1,15 @@
-import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, ArrowLeft, ArrowRight, Home, CheckCircle2 } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
+import { authClient } from "@/lib/auth-client";
+
+
+const ANIMATION_HOVER_SCALE = 1.01;
+const ANIMATION_TAP_SCALE = 0.98;
+
+// eslint-disable-next-line max-lines-per-function -- Page components bundle layout and cohesive logic
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -103,7 +109,7 @@ export function ForgotPasswordPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onSubmit={handleSubmit}
+                onSubmit={(e) => { void handleSubmit(e); }}
                 className="p-6 space-y-4"
               >
                 <AnimatePresence mode="wait">
@@ -139,8 +145,8 @@ export function ForgotPasswordPage() {
                 <motion.button
                   type="submit"
                   disabled={loading}
-                  whileHover={{ scale: loading ? 1 : 1.01 }}
-                  whileTap={{ scale: loading ? 1 : 0.98 }}
+                  whileHover={{ scale: loading ? 1 : ANIMATION_HOVER_SCALE }}
+                  whileTap={{ scale: loading ? 1 : ANIMATION_TAP_SCALE }}
                   className="w-full py-3.5 bg-primary text-primary-foreground rounded-xl text-[13px] font-bold tracking-wide flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors mt-2"
                 >
                   {loading ? (

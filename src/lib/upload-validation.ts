@@ -1,3 +1,5 @@
+import { UI_CONSTANTS } from './constants';
+
 /**
  * Shared upload validation utilities.
  * SEC-004: Client-side defense-in-depth for file uploads.
@@ -6,15 +8,15 @@
 
 export const UPLOAD_LIMITS = {
   /** Maximum file size in bytes (10MB) */
-  MAX_FILE_SIZE: 10 * 1024 * 1024,
+  get MAX_FILE_SIZE() { return UI_CONSTANTS.MAX_FILE_SIZE; },
   /** Maximum number of property gallery images */
-  MAX_PROPERTY_IMAGES: 20,
+  get MAX_PROPERTY_IMAGES() { return UI_CONSTANTS.MAX_PROPERTY_IMAGES; },
   /** Maximum number of chat attachment images */
-  MAX_CHAT_IMAGES: 5,
+  get MAX_CHAT_IMAGES() { return UI_CONSTANTS.MAX_CHAT_IMAGES; },
   /** Maximum profile image size in bytes (5MB) */
-  MAX_PROFILE_IMAGE_SIZE: 5 * 1024 * 1024,
+  get MAX_PROFILE_IMAGE_SIZE() { return UI_CONSTANTS.MAX_PROFILE_IMAGE_SIZE; },
   /** Allowed MIME types for image uploads — SVG intentionally excluded (XSS vector) */
-  ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'] as readonly string[],
+  get ALLOWED_IMAGE_TYPES() { return UI_CONSTANTS.ALLOWED_IMAGE_TYPES; },
 } as const;
 
 /**
@@ -23,14 +25,14 @@ export const UPLOAD_LIMITS = {
  */
 export function validateImageFile(
   file: File,
-  maxSize: number = UPLOAD_LIMITS.MAX_FILE_SIZE
+  maxSize: number = UI_CONSTANTS.MAX_FILE_SIZE
 ): string | null {
-  if (!UPLOAD_LIMITS.ALLOWED_IMAGE_TYPES.includes(file.type)) {
+  if (!UI_CONSTANTS.ALLOWED_IMAGE_TYPES.includes(file.type)) {
     return `Invalid file type: "${file.name}". Allowed: JPEG, PNG, WebP.`;
   }
   if (file.size > maxSize) {
-    const maxMB = Math.round(maxSize / (1024 * 1024));
-    return `File too large: "${file.name}" (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum ${maxMB}MB.`;
+    const maxMB = Math.round(maxSize / (UI_CONSTANTS.MB_BYTES));
+    return `File too large: "${file.name}" (${(file.size / (UI_CONSTANTS.MB_BYTES)).toFixed(1)}MB). Maximum ${maxMB}MB.`;
   }
   return null;
 }
@@ -41,7 +43,7 @@ export function validateImageFile(
  */
 export function validateImageFiles(
   files: File[],
-  maxSize: number = UPLOAD_LIMITS.MAX_FILE_SIZE
+  maxSize: number = UI_CONSTANTS.MAX_FILE_SIZE
 ): string[] {
   return files
     .map((f) => validateImageFile(f, maxSize))

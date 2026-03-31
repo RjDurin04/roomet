@@ -81,15 +81,17 @@ export const create = mutation({
     }
 
     // Insert review
-    const reviewId = await ctx.db.insert("reviews", {
+    const payload: Record<string, unknown> = {
       propertyId: args.propertyId,
       userId: profile._id,
       rating: args.rating,
-      comment: args.comment,
       createdAt: Date.now(),
       userName: authUser.name || "Anonymous User",
-      userImage: authUser.image || undefined,
-    });
+    };
+    if (args.comment !== undefined) payload.comment = args.comment;
+    if (authUser.image !== undefined) payload.userImage = authUser.image;
+
+    const reviewId = await ctx.db.insert("reviews", payload);
 
     // Send notification to Owner
     await ctx.db.insert("notifications", {
@@ -137,14 +139,21 @@ export const getUserReviews = query({
       })
     );
 
-    return hydrated.filter(Boolean) as any[];
+    return hydrated.filter(Boolean) as NonNullable<typeof hydrated[number]>[];
   },
 });
 
 export const getOwnerReviews = query({
   args: {},
   handler: async (ctx) => {
-    const authUser = await authComponent.getAuthUser(ctx);
+    let authUser;
+    try {
+      authUser = await authComponent.getAuthUser(ctx);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes("Unauthenticated")) return [];
+      throw e;
+    }
+    
     if (!authUser) return [];
 
     const owner = await ctx.db

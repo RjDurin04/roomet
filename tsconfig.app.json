@@ -1,4 +1,5 @@
 {
+  "extends": "./tsconfig.strict.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -28,5 +29,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src", "convex"]
 }

@@ -1,15 +1,16 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
+import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { authComponent } from "./auth";
 
 // Helper to get authorized user (RES-M02b: unified auth pattern)
-async function requireUser(ctx: any) {
+async function requireUser(ctx: MutationCtx | QueryCtx) {
   const authUser = await authComponent.getAuthUser(ctx);
   if (!authUser) throw new Error("Unauthorized");
   const user = await ctx.db
     .query("users")
-    .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
+    .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
     .first();
   if (!user) throw new Error("User not found");
   return user;
@@ -90,15 +91,17 @@ export const sendMessage = mutation({
        throw new Error("Unauthorized participant");
     }
 
-    const messageId = await ctx.db.insert("messages", {
+    const payload: Record<string, unknown> = {
        conversationId: args.conversationId,
        senderId: user._id,
-       text: args.text,
-       image: args.image,
-       images: args.images,
        isRead: false,
        createdAt: Date.now(),
-    });
+    };
+    if (args.text !== undefined) payload.text = args.text;
+    if (args.image !== undefined) payload.image = args.image;
+    if (args.images !== undefined) payload.images = args.images;
+
+    const messageId = await ctx.db.insert("messages", payload);
 
     const isSenderViewer = conversation.viewerId === user._id;
 
@@ -131,8 +134,8 @@ export const getMessages = query({
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
-    } catch (e: any) {
-      if (e.message && e.message.includes("Unauthenticated")) return [];
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes("Unauthenticated")) return [];
       throw e;
     }
     if (!authUser) return [];
@@ -272,8 +275,8 @@ export const getUserConversations = query({
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
-    } catch (e: any) {
-      if (e.message && e.message.includes("Unauthenticated")) return [];
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes("Unauthenticated")) return [];
       throw e;
     }
     if (!authUser) return [];
@@ -320,7 +323,7 @@ export const getUserConversations = query({
           const peer = await ctx.db.get(peerId);
 
           let imageUrl = undefined;
-          if (property.images && property.images.length > 0) {
+          if (property.images && property.images.length > 0 && property.images[0]) {
              imageUrl = await ctx.storage.getUrl(property.images[0]);
           }
 
@@ -357,6 +360,8 @@ export const getUserConversations = query({
                 address: property.location.address,
                 priceMin,
                 image: imageUrl,
+                isVisible: property.isVisible ?? true,
+                status: property.status || "Active",
              },
              peer: {
                 id: peerId,

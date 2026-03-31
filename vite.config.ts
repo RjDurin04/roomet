@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
       },
       proxy: {
         '/api/auth': {
-          target: env.VITE_CONVEX_SITE_URL,
+          target: env['VITE_CONVEX_SITE_URL'] ?? '',
           changeOrigin: true,
         },
       },

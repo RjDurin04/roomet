@@ -114,7 +114,7 @@ export default defineSchema({
     image: v.optional(v.id("_storage")),
     images: v.optional(v.array(v.id("_storage"))),
     isRead: v.boolean(),
-    createdAt: v.number(),
+    createdAt: v.optional(v.number()),
   })
     .index("by_conversation", ["conversationId"]),
 });

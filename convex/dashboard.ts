@@ -6,7 +6,14 @@ export const getOwnerStats = query({
   args: {},
   handler: async (ctx) => {
     // 1. Authenticate user
-    const authUser = await authComponent.getAuthUser(ctx);
+    let authUser;
+    try {
+      authUser = await authComponent.getAuthUser(ctx);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes("Unauthenticated")) return null;
+      throw e;
+    }
+    
     if (!authUser) return null;
 
     const profile = await ctx.db

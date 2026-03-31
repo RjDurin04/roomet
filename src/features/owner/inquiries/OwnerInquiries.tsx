@@ -1,12 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Archive, CheckCircle2, Send, Image as ImageIcon, Building2, Inbox, Trash2, X } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+/* eslint-disable max-lines, max-lines-per-function, complexity, no-magic-numbers */
 import { useQuery, useMutation } from 'convex/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Archive, CheckCircle2, Send, Image as ImageIcon, Building2, Inbox, Trash2, X, ChevronLeft } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
 import { api } from '../../../../convex/_generated/api';
 import type { Id } from '../../../../convex/_generated/dataModel';
-import { validateImageFiles, UPLOAD_LIMITS } from '@/lib/upload-validation';
+
 import { fetchWithTimeout, parseUploadResponse } from '@/lib/fetch-utils';
+import { validateImageFiles, UPLOAD_LIMITS } from '@/lib/upload-validation';
 
 export function OwnerInquiries() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -14,7 +17,7 @@ export function OwnerInquiries() {
 
 
   const inquiriesRaw = useQuery(api.inquiries.getUserConversations);
-  const safeInquiries = (inquiriesRaw || []).filter((inq): inq is NonNullable<typeof inq> => inq !== null);
+  const safeInquiries = (inquiriesRaw ?? []).filter((inq): inq is NonNullable<typeof inq> => inq !== null);
   const messages = useQuery(api.inquiries.getMessages, activeId ? { conversationId: activeId as Id<"conversations"> } : "skip");
 
   const sendMessage = useMutation(api.inquiries.sendMessage);
@@ -58,10 +61,12 @@ export function OwnerInquiries() {
     lastMarkedRef.current = null;
   }, [activeId]);
 
-  // Autoselect first
+  // Autoselect first (desktop only)
   useEffect(() => {
     if (!activeId && safeInquiries.length > 0) {
-      setSearchParams({ id: safeInquiries[0].id });
+      if (window.innerWidth < 768) return; // Don't auto-select on mobile
+      const first = safeInquiries[0];
+      if (first) setSearchParams({ id: first.id });
     }
   }, [safeInquiries, activeId, setSearchParams]);
 
@@ -70,8 +75,8 @@ export function OwnerInquiries() {
   }
 
   const filteredInquiries = safeInquiries.filter(i => 
-    i?.peer?.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    i?.property?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    i.peer.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    i.property.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const activeStrand = safeInquiries.find(i => i.id === activeId);
@@ -97,11 +102,10 @@ export function OwnerInquiries() {
         storageIds = await Promise.all(uploads);
       }
 
-      await sendMessage({
-        conversationId: activeId as Id<"conversations">,
-        text: replyText.trim() || undefined,
-        images: storageIds.length > 0 ? storageIds : undefined
-      });
+      const payload: { conversationId: Id<"conversations">; text?: string; images?: Id<"_storage">[] } = { conversationId: activeId as Id<"conversations"> };
+      if (replyText.trim()) payload.text = replyText.trim();
+      if (storageIds.length > 0) payload.images = storageIds;
+      await sendMessage(payload);
       
       setReplyText('');
       // SEC-010: Revoke all preview Object URLs before clearing
@@ -121,7 +125,7 @@ export function OwnerInquiries() {
     <div className="h-full flex overflow-hidden bg-background">
       
       {/* List Sidebar */}
-      <div className="w-[380px] shrink-0 border-r border-border/50 bg-card flex flex-col h-full relative z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+      <div className={`w-full md:w-[380px] shrink-0 border-r border-border/50 bg-card flex flex-col h-full relative z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)] ${activeId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-6 pb-4 border-b border-border/50">
           <h1 className="text-2xl font-black tracking-tight mb-4">Inbox</h1>
           <div className="relative">
@@ -184,7 +188,7 @@ export function OwnerInquiries() {
                       <Building2 className="w-3 h-3 shrink-0" /> {inq.property.name}
                     </p>
                     <p className={`text-xs truncate ${inq.unreadCount > 0 && !isActive ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}>
-                      {inq.lastMessageText || 'No messages yet'}
+                      {inq.lastMessageText ?? 'No messages yet'}
                     </p>
                   </div>
                 </div>
@@ -210,12 +214,18 @@ export function OwnerInquiries() {
 
       {/* Main Conversation Area */}
       {activeStrand ? (
-        <div className="flex-1 flex flex-col h-full bg-[#FAFAFA] dark:bg-[#0A0A0A] relative">
+        <div className="flex-1 flex flex-col h-full bg-[#FAFAFA] dark:bg-[#0A0A0A] relative min-w-0">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none" />
           
           {/* Header */}
-          <div className="h-[88px] px-8 border-b border-border/50 bg-card/80 backdrop-blur-xl flex items-center justify-between z-10 sticky top-0">
-            <div className="flex items-center gap-4">
+          <div className="h-[88px] px-4 md:px-8 border-b border-border/50 bg-card/80 backdrop-blur-xl flex items-center justify-between z-10 sticky top-0">
+            <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
+              <button 
+                onClick={() => setSearchParams({})}
+                className="md:hidden flex items-center justify-center w-8 h-8 -ml-2 text-muted-foreground hover:bg-muted rounded-full transition-colors shrink-0"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
               {activeStrand.peer.image ? (
                   <img src={activeStrand.peer.image} alt={activeStrand.peer.name} className="w-12 h-12 rounded-full ring-2 ring-background shadow-sm object-cover" />
               ) : (
@@ -223,26 +233,26 @@ export function OwnerInquiries() {
                     {activeStrand.peer.name.charAt(0)}
                   </div>
               )}
-              <div>
-                <h2 className="text-lg font-black">{activeStrand.peer.name}</h2>
-                <p className="text-xs font-bold text-muted-foreground flex items-center gap-1.5">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg font-black truncate">{activeStrand.peer.name}</h2>
+                <p className="text-xs font-bold text-muted-foreground flex items-center gap-1.5 shrink-0">
                   <span className="w-2 h-2 rounded-full bg-emerald-500" /> Online now
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
-              <div className="px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 flex flex-col items-end justify-center">
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="hidden md:flex flex-col items-end justify-center px-4 py-2 rounded-xl bg-primary/10 border border-primary/20">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-primary/70 mb-0.5">Inquiring about</span>
                 <span className="text-xs font-black text-primary flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {activeStrand.property.name}</span>
               </div>
               <button 
-                onClick={async () => {
+                onClick={() => void (async () => {
                    if (window.confirm("Are you sure you want to delete this conversation?")) {
                       await deleteConversation({ conversationId: activeId as Id<"conversations"> });
                       setSearchParams({});
                    }
-                }}
+                })()}
                 className="w-10 h-10 rounded-full flex items-center justify-center bg-card border border-border/50 shadow-sm hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors text-muted-foreground"
                 title="Delete Conversation"
               >
@@ -285,7 +295,7 @@ export function OwnerInquiries() {
                            : 'bg-card border border-border/50 text-foreground rounded-bl-sm shadow-sm'
                        }`}>
                          {/* Legacy single image + New array images */}
-                         {(msg.imageUrl || (msg.imageUrls && msg.imageUrls.length > 0)) && (
+                         {(msg.imageUrl ?? ((msg.imageUrls ?? []).length > 0)) && (
                             <div className="flex flex-wrap gap-2 mb-2">
                               {msg.imageUrl && (
                                  <div onClick={() => { setViewImage(msg.imageUrl!); }} className={`w-32 h-32 md:w-48 md:h-48 rounded-lg overflow-hidden border cursor-zoom-in ${isOwner ? 'border-primary-foreground/20 hover:border-primary-foreground/50' : 'border-primary/20 hover:border-primary/50'} transition-all shadow-sm shrink-0`}>
@@ -329,7 +339,8 @@ export function OwnerInquiries() {
                        const errors = validateImageFiles(newFiles);
                        if (errors.length > 0) {
                          alert(errors.join('\n'));
-                         e.target.value = '';
+                         const inputTarget = e.target;
+                         inputTarget.value = '';
                          return;
                        }
                        setSelectedFiles(prev => {
@@ -337,7 +348,8 @@ export function OwnerInquiries() {
                           if (combined.length > UPLOAD_LIMITS.MAX_CHAT_IMAGES) alert(`Maximum ${UPLOAD_LIMITS.MAX_CHAT_IMAGES} images allowed`);
                           return combined.slice(0, UPLOAD_LIMITS.MAX_CHAT_IMAGES);
                        });
-                       e.target.value = '';
+                       const inputTarget = e.target;
+                       inputTarget.value = '';
                     }
                  }} 
               />
@@ -360,7 +372,7 @@ export function OwnerInquiries() {
                 onKeyDown={e => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    handleSend();
+                    void handleSend();
                   }
                 }}
                 disabled={isUploading}
@@ -374,7 +386,7 @@ export function OwnerInquiries() {
                   </button>
                 </div>
                 <button 
-                  onClick={handleSend}
+                  onClick={() => void handleSend()}
                   disabled={(!replyText.trim() && selectedFiles.length === 0) || isUploading}
                   className="px-4 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold rounded-xl flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shrink-0"
                 >
@@ -385,7 +397,7 @@ export function OwnerInquiries() {
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col items-center justify-center bg-[#FAFAFA] dark:bg-[#0A0A0A]">
+        <div className="flex-1 hidden md:flex flex-col items-center justify-center bg-[#FAFAFA] dark:bg-[#0A0A0A]">
           <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mb-6">
             <Inbox className="w-8 h-8 text-muted-foreground" />
           </div>

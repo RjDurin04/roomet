@@ -1,9 +1,12 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, ArrowLeft, RefreshCw, Home, CheckCircle2 } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import { authClient } from "@/lib/auth-client";
+
+
+// eslint-disable-next-line max-lines-per-function -- Page components bundle layout and cohesive logic
 export function EmailVerificationPage() {
   const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);

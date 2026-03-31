@@ -5,7 +5,14 @@ import { authComponent } from "./auth";
 export const get = query({
   args: {},
   handler: async (ctx) => {
-    const authUser = await authComponent.getAuthUser(ctx);
+    let authUser;
+    try {
+      authUser = await authComponent.getAuthUser(ctx);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes("Unauthenticated")) return [];
+      throw e;
+    }
+    
     if (!authUser) return [];
 
     const user = await ctx.db

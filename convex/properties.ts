@@ -1,9 +1,10 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { authComponent } from "./auth";
 
 // Helper to get the authenticated user's profile
-async function getAuthenticatedProfile(ctx: any) {
+async function getAuthenticatedProfile(ctx: MutationCtx | QueryCtx) {
   const authUser = await authComponent.getAuthUser(ctx);
   if (!authUser) {
     throw new Error("Not authenticated");
@@ -11,7 +12,7 @@ async function getAuthenticatedProfile(ctx: any) {
 
   const profile = await ctx.db
     .query("users")
-    .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
+    .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
     .unique();
 
   if (!profile) {
@@ -21,7 +22,7 @@ async function getAuthenticatedProfile(ctx: any) {
   return profile;
 }
 
-function validatePropertyInput(args: any) {
+function validatePropertyInput(args: { name: string; description: string; rooms: { price: number; capacity: number; occupied?: number; name?: string }[]; location: { lat: number; lng: number } }) {
   if (!args.name.trim() || args.name.length > 200) {
     throw new Error("Property name must be 1-200 chars");
   }
@@ -93,7 +94,7 @@ export const create = mutation({
 
     validatePropertyInput(args);
 
-    const { visitingSchedule, ...restArgs } = args;
+    const { visitingSchedule: _visitingSchedule, ...restArgs } = args;
 
     const propertyId = await ctx.db.insert("properties", {
       ...restArgs,
@@ -153,8 +154,8 @@ export const listByOwner = query({
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
-    } catch (e: any) {
-      if (e.message && e.message.includes("Unauthenticated")) {
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes("Unauthenticated")) {
         return [];
       }
       throw e;
@@ -172,7 +173,8 @@ export const listByOwner = query({
     const properties = await ctx.db
       .query("properties")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", profile._id))
-      .collect();
+      .collect()
+      .then((props) => props.filter((p) => p.status !== "Deleted"));
 
     // Map storage IDs to actual URLs
     return Promise.all(
@@ -238,6 +240,71 @@ export const remove = mutation({
   },
 });
 
+export const listDeleted = query({
+  args: {},
+  handler: async (ctx) => {
+    let authUser;
+    try {
+      authUser = await authComponent.getAuthUser(ctx);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes("Unauthenticated")) {
+        return [];
+      }
+      throw e;
+    }
+    if (!authUser) return [];
+
+    const profile = await ctx.db
+      .query("users")
+      .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
+      .unique();
+
+    if (!profile) return [];
+
+    const properties = await ctx.db
+      .query("properties")
+      .withIndex("by_ownerId", (q) => q.eq("ownerId", profile._id))
+      .collect()
+      .then((props) => props.filter((p) => p.status === "Deleted"));
+
+    return Promise.all(
+      properties.map(async (property) => {
+        const imageUrls = await Promise.all(
+          property.images.map(async (storageId) => {
+            return await ctx.storage.getUrl(storageId);
+          })
+        );
+        return { ...property, imageUrls };
+      })
+    );
+  },
+});
+
+export const restore = mutation({
+  args: { id: v.id("properties") },
+  handler: async (ctx, args) => {
+    const profile = await getAuthenticatedProfile(ctx);
+    const property = await ctx.db.get(args.id);
+
+    if (!property) {
+      throw new Error("Property not found");
+    }
+
+    if (property.ownerId !== profile._id) {
+      throw new Error("Unauthorized to restore this property");
+    }
+
+    if (property.status !== "Deleted") {
+      throw new Error("Property is not deleted");
+    }
+
+    await ctx.db.patch(args.id, {
+      status: "Active",
+      isVisible: false, // Restore as hidden — owner can manually publish
+    });
+  },
+});
+
 export const generateUploadUrl = mutation(async (ctx) => {
   const profile = await getAuthenticatedProfile(ctx);
   if (profile.role !== "owner") {
@@ -276,7 +343,6 @@ export const update = mutation({
       lat: v.number(),
       lng: v.number(),
     }),
-    genderRestriction: v.union(v.literal("male"), v.literal("female"), v.literal("mixed")),
     amenities: v.array(v.string()),
     rules: v.string(),
     images: v.array(v.string()),
@@ -309,7 +375,7 @@ export const update = mutation({
 
     validatePropertyInput(args);
 
-    const { id, visitingSchedule, ...updateFields } = args;
+    const { id, visitingSchedule: _visitingSchedule, ...updateFields } = args;
 
     await ctx.db.patch(id, updateFields);
   },

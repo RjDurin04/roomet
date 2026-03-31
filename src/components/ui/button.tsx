@@ -55,4 +55,5 @@ function Button({
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- Exporting variants alongside components is a standard pattern
 export { Button, buttonVariants }

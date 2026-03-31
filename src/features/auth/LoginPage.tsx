@@ -1,9 +1,15 @@
-import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Home } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
+import { authClient } from "@/lib/auth-client";
+
+
+const ANIMATION_HOVER_SCALE = 1.01;
+const ANIMATION_TAP_SCALE = 0.98;
+
+// eslint-disable-next-line max-lines-per-function -- Page components bundle layout and cohesive logic
 export function LoginPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
@@ -32,7 +38,7 @@ export function LoginPage() {
         } else {
           // After signup, redirect to email verification page
           // Do NOT log them in — they must verify email first
-          navigate("/verify-email");
+          void navigate("/verify-email");
         }
       } else {
         const { error } = await authClient.signIn.email({
@@ -44,7 +50,7 @@ export function LoginPage() {
           setError("Invalid email or password.");
         } else {
           // After signin, navigate to home (App.tsx handles role routing)
-          navigate("/");
+          void navigate("/");
         }
       }
     } catch {
@@ -146,7 +152,7 @@ export function LoginPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={(e) => { void handleSubmit(e); }} className="p-6 space-y-4">
             <AnimatePresence mode="wait">
               {error && (
                 <motion.div
@@ -179,7 +185,7 @@ export function LoginPage() {
                       value={name}
                       onChange={(e) => { setName(e.target.value); }}
                       placeholder="Juan Dela Cruz"
-                      required={mode === "signup"}
+                      required={true}
                       className="w-full pl-10 pr-4 py-3 bg-muted/30 border border-border/50 rounded-xl text-[13px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
                     />
                   </div>
@@ -251,8 +257,8 @@ export function LoginPage() {
             <motion.button
               type="submit"
               disabled={loading}
-              whileHover={{ scale: loading ? 1 : 1.01 }}
-              whileTap={{ scale: loading ? 1 : 0.98 }}
+              whileHover={{ scale: loading ? 1 : ANIMATION_HOVER_SCALE }}
+              whileTap={{ scale: loading ? 1 : ANIMATION_TAP_SCALE }}
               className="w-full py-3.5 bg-primary text-primary-foreground rounded-xl text-[13px] font-bold tracking-wide flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors mt-2"
             >
               {loading ? (
@@ -279,9 +285,9 @@ export function LoginPage() {
             <motion.button
               type="button"
               disabled={loading}
-              onClick={handleGoogleSignIn}
-              whileHover={{ scale: loading ? 1 : 1.01 }}
-              whileTap={{ scale: loading ? 1 : 0.98 }}
+              onClick={() => { void handleGoogleSignIn(); }}
+              whileHover={{ scale: loading ? 1 : ANIMATION_HOVER_SCALE }}
+              whileTap={{ scale: loading ? 1 : ANIMATION_TAP_SCALE }}
               className="w-full py-3.5 bg-background border border-border/50 text-foreground rounded-xl text-[13px] font-bold tracking-wide flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted/30 transition-colors"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

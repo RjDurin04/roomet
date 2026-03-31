@@ -1,14 +1,15 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { authComponent } from "./auth";
 
 // Helper to get authorized user (RES-M02b: unified auth pattern)
-async function requireUser(ctx: any) {
+async function requireUser(ctx: MutationCtx | QueryCtx) {
   const authUser = await authComponent.getAuthUser(ctx);
   if (!authUser) throw new Error("Unauthorized");
   const user = await ctx.db
     .query("users")
-    .withIndex("by_authUserId", (q: any) => q.eq("authUserId", authUser._id))
+    .withIndex("by_authUserId", (q) => q.eq("authUserId", authUser._id))
     .first();
   if (!user) throw new Error("User not found");
   return user;
@@ -46,8 +47,8 @@ export const check = query({
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
-    } catch (e: any) {
-      if (e.message && e.message.includes("Unauthenticated")) return false;
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes("Unauthenticated")) return false;
       throw e;
     }
     if (!authUser) return false;
@@ -76,8 +77,8 @@ export const getUserBookmarks = query({
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
-    } catch (e: any) {
-      if (e.message && e.message.includes("Unauthenticated")) return [];
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message.includes("Unauthenticated")) return [];
       throw e;
     }
     if (!authUser) return [];
@@ -98,7 +99,7 @@ export const getUserBookmarks = query({
     const properties = await Promise.all(
       bookmarks.map(async (bk) => {
         const p = await ctx.db.get(bk.propertyId);
-        if (!p) return null;
+        if (!p || p.status === "Deleted" || p.isVisible === false) return null;
 
         // Fetch image URLs
         let imageUrls: (string | null)[] = [];
@@ -141,6 +142,6 @@ export const getUserBookmarks = query({
       })
     );
 
-    return properties.filter(Boolean) as any[];
+    return properties.filter(Boolean) as NonNullable<typeof properties[number]>[];
   },
 });

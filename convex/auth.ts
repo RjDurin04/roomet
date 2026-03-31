@@ -9,13 +9,13 @@ import { createAuthEndpoint, sessionMiddleware } from "better-auth/api";
 import { z } from "zod";
 import authConfig from "./auth.config";
 
-// @ts-ignore - process is defined by Convex runtime
+// @ts-expect-error - process is defined by Convex runtime
 const siteUrl = process.env.SITE_URL!;
 
 async function sendEmailJSEmail(templateId: string, templateParams: Record<string, string>) {
-  const serviceId = process.env.EMAILJS_SERVICE_ID!;
-  const publicKey = process.env.EMAILJS_PUBLIC_KEY!;
-  const privateKey = process.env.EMAILJS_PRIVATE_KEY!;
+  const serviceId = process.env['EMAILJS_SERVICE_ID']!;
+  const publicKey = process.env['EMAILJS_PUBLIC_KEY']!;
+  const privateKey = process.env['EMAILJS_PRIVATE_KEY']!;
 
   if (!serviceId || !publicKey || !privateKey) {
     console.error("EmailJS environment variables are missing.");
@@ -66,7 +66,7 @@ const customSetPasswordPlugin = {
       const passwordHash = await ctx.context.password.hash(newPassword);
       const accounts = await ctx.context.internalAdapter.findAccounts(session.user.id);
       
-      const hasCredential = accounts.some((a: any) => a.providerId === "credential" && a.password);
+      const hasCredential = accounts.some((a: { providerId: string; password?: string }) => a.providerId === "credential" && a.password);
       if (hasCredential) {
         return new Response(JSON.stringify({ message: "Password already set" }), { status: 400 });
       }
@@ -85,8 +85,8 @@ const customSetPasswordPlugin = {
 
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
   return betterAuth({
-    baseURL: process.env.BETTER_AUTH_URL || siteUrl || "http://localhost:5173",
-    trustedOrigins: [process.env.BETTER_AUTH_URL || siteUrl || "http://localhost:5173"],
+    baseURL: process.env['BETTER_AUTH_URL'] || siteUrl || "http://localhost:5173",
+    trustedOrigins: [process.env['BETTER_AUTH_URL'] || siteUrl || "http://localhost:5173"],
     database: authComponent.adapter(ctx),
     emailAndPassword: {
       enabled: true,
@@ -94,7 +94,7 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
       minPasswordLength: 8,
       maxPasswordLength: 128,
       sendResetPassword: async ({ user, url }) => {
-        const templateId = process.env.EMAILJS_TEMPLATE_ID_RESET!;
+        const templateId = process.env['EMAILJS_TEMPLATE_ID_RESET']!;
         if (templateId) {
           await sendEmailJSEmail(templateId, {
             email: user.email,
@@ -107,7 +107,7 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
       sendOnSignUp: true,
       autoSignInAfterVerification: true,
       sendVerificationEmail: async ({ user, url }) => {
-        const templateId = process.env.EMAILJS_TEMPLATE_ID_VERIFY!;
+        const templateId = process.env['EMAILJS_TEMPLATE_ID_VERIFY']!;
         if (templateId) {
           await sendEmailJSEmail(templateId, {
             name: user.name || "User",
@@ -119,8 +119,8 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
     },
     socialProviders: {
       google: {
-        clientId: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        clientId: process.env['GOOGLE_CLIENT_ID']!,
+        clientSecret: process.env['GOOGLE_CLIENT_SECRET']!,
       },
     },
     plugins: [

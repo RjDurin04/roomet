@@ -9,9 +9,9 @@ export const getMyProfile = query({
     let authUser;
     try {
       authUser = await authComponent.getAuthUser(ctx);
-    } catch (e: any) {
+    } catch (e: unknown) {
       // getAuthUser throws if not authenticated. We want it to be optional for getMyProfile.
-      if (e.message && e.message.includes("Unauthenticated")) {
+      if (e instanceof Error && e.message.includes("Unauthenticated")) {
         return null;
       }
       throw e;

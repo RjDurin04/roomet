@@ -1,9 +1,17 @@
-import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lock, Eye, EyeOff, ArrowRight, Home, CheckCircle2, AlertTriangle } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
+import React, { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
+import { authClient } from "@/lib/auth-client";
+
+
+const MIN_PASSWORD_LENGTH = 8;
+
+const ANIMATION_HOVER_SCALE = 1.01;
+const ANIMATION_TAP_SCALE = 0.98;
+
+// eslint-disable-next-line max-lines-per-function -- Page components bundle layout and cohesive logic
 export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
@@ -62,8 +70,8 @@ export function ResetPasswordPage() {
       return;
     }
 
-    if (newPassword.length < 8) {
-      setError("Password must be at least 8 characters.");
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
       return;
     }
 
@@ -77,7 +85,7 @@ export function ResetPasswordPage() {
         if (resetError.code === "INVALID_TOKEN") {
           setError("This reset link has expired. Please request a new one.");
         } else if (resetError.code === "PASSWORD_TOO_SHORT") {
-          setError("Password must be at least 8 characters.");
+          setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
         } else if (resetError.code === "PASSWORD_TOO_LONG") {
           setError("Password is too long. Maximum 128 characters.");
         } else {
@@ -166,7 +174,7 @@ export function ResetPasswordPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onSubmit={handleSubmit}
+                onSubmit={(e) => { void handleSubmit(e); }}
                 className="p-6 space-y-4"
               >
                 <AnimatePresence mode="wait">
@@ -246,8 +254,8 @@ export function ResetPasswordPage() {
                 <motion.button
                   type="submit"
                   disabled={loading}
-                  whileHover={{ scale: loading ? 1 : 1.01 }}
-                  whileTap={{ scale: loading ? 1 : 0.98 }}
+                  whileHover={{ scale: loading ? 1 : ANIMATION_HOVER_SCALE }}
+                  whileTap={{ scale: loading ? 1 : ANIMATION_TAP_SCALE }}
                   className="w-full py-3.5 bg-primary text-primary-foreground rounded-xl text-[13px] font-bold tracking-wide flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors mt-2"
                 >
                   {loading ? (

@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import { useMutation } from "convex/react";
 import { motion } from "framer-motion";
 import { Search, Building2, ArrowRight, Home } from "lucide-react";
-import { useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { api } from "../../../convex/_generated/api";
+
 import { authClient } from "@/lib/auth-client";
 
 type Role = "viewer" | "owner";
 
+// eslint-disable-next-line max-lines-per-function -- Page components bundle layout and cohesive logic
 export function OnboardingPage() {
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [loading, setLoading] = useState(false);
@@ -26,9 +29,9 @@ export function OnboardingPage() {
       
       // Route based on role
       if (selectedRole === "owner") {
-        navigate("/owner");
+        void navigate("/owner");
       } else {
-        navigate("/tenant");
+        void navigate("/tenant");
       }
     } catch (error) {
       console.error("Failed to set role:", error);
@@ -103,7 +106,7 @@ export function OnboardingPage() {
           transition={{ delay: 0.6 }}
         >
           <button
-            onClick={handleContinue}
+            onClick={() => { void handleContinue(); }}
             disabled={!selectedRole || loading}
             className={`w-full py-4 rounded-xl text-[14px] font-bold tracking-wide flex items-center justify-center gap-2 transition-all duration-300 ${
               selectedRole && !loading

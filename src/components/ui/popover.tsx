@@ -1,9 +1,11 @@
 "use client"
 
-import * as React from "react"
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover"
+import * as React from "react"
 
 import { cn } from "@/lib/utils"
+
+const DEFAULT_SIDE_OFFSET = 4;
 
 function Popover({ ...props }: PopoverPrimitive.Root.Props) {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />
@@ -18,7 +20,7 @@ function PopoverContent({
   align = "center",
   alignOffset = 0,
   side = "bottom",
-  sideOffset = 4,
+  sideOffset = DEFAULT_SIDE_OFFSET,
   ...props
 }: PopoverPrimitive.Popup.Props &
   Pick<

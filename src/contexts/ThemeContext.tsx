@@ -9,6 +9,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType>({ theme: 'dark', toggleTheme: () => {} });
 
+// eslint-disable-next-line react-refresh/only-export-components -- Exporting context hooks alongside providers is a standard pattern
 export function useTheme() {
   return useContext(ThemeContext);
 }
@@ -16,7 +17,7 @@ export function useTheme() {
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {
-      return (localStorage.getItem('roomet-theme') as Theme) || 'dark';
+      return (localStorage.getItem('roomet-theme') ?? 'dark') as Theme;
     }
     return 'dark';
   });

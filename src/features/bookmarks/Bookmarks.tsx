@@ -1,19 +1,29 @@
-import { useState } from 'react';
-import { Bookmark as BookmarkIcon, Star, MapPin, Trash2, Grid3X3, List, ExternalLink } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation } from 'convex/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Bookmark as BookmarkIcon, Star, MapPin, Trash2, Grid3X3, List, ExternalLink, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { api } from '../../../convex/_generated/api';
 import type { Id } from '../../../convex/_generated/dataModel';
 
 type ViewMode = 'grid' | 'list';
 
+// eslint-disable-next-line max-lines-per-function -- Page component is cohesive
 export function Bookmarks() {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   
-  const items = useQuery(api.bookmarks.getUserBookmarks) || [];
+  const items = useQuery(api.bookmarks.getUserBookmarks);
   const toggleBookmark = useMutation(api.bookmarks.toggle);
+
+  if (items === undefined) {
+    return (
+      <div className="flex-1 h-full flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary/40 animate-spin" />
+      </div>
+    );
+  }
 
   const removeItem = async (id: string) => {
     await toggleBookmark({ propertyId: id as Id<"properties"> });
@@ -79,7 +89,7 @@ export function Bookmarks() {
                     {/* Overlay Actions */}
                     <div className="absolute top-3 right-3 flex gap-2">
                       <button 
-                        onClick={(e) => { e.stopPropagation(); removeItem(bh.id); }} 
+                        onClick={(e) => { e.stopPropagation(); void removeItem(bh.id); }} 
                         className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-destructive/80 flex items-center justify-center transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -165,7 +175,7 @@ export function Bookmarks() {
                     <button onClick={() => navigate(`/tenant/map/roomet/${bh.id}`)} className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
                       <ExternalLink className="w-4 h-4" />
                     </button>
-                    <button onClick={() => removeItem(bh.id)} className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors">
+                    <button onClick={() => { void removeItem(bh.id); }} className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>

@@ -1,30 +1,56 @@
-# Pipeline Enforcement — pre-commit hooks
-# Replaces: security/ban-hardcoded-secrets.md, testing/enforce-coverage-threshold.md, testing/enforce-test-isolation.md (indirectly)
-# These run BEFORE code enters the repo — the AI cannot bypass them.
+# =============================================================================
+# TIER 1 PIPELINE ENFORCEMENT — Git Hooks
+# Replaces: security/ban-hardcoded-secrets, testing/enforce-coverage-threshold
+# These run BEFORE code enters the repo. The AI cannot bypass them.
+# =============================================================================
 
 pre-commit:
   parallel: true
   commands:
-    # ── Replaces: security/ban-hardcoded-secrets ──
+
+    # ── Secrets — catches what the AI might embed silently ──────────────────
     secrets:
       run: npx gitleaks detect --source . --verbose
-      fail_text: "❌ Hardcoded secrets detected. Remove them before committing."
+      fail_text: "❌ Hardcoded secrets detected. Remove before committing."
 
-    # ── Replaces: code-quality rules (all in eslint.config.js) ──
+    # ── Lint — all style, type-safety, async correctness, security rules ────
     lint:
-      glob: "*.{ts,tsx}"
+      glob: "**/*.{ts,tsx}"
       run: npx eslint {staged_files} --max-warnings 0
-      fail_text: "❌ ESLint violations found. Fix before committing."
+      fail_text: "❌ ESLint violations. Fix before committing."
 
-    # ── Replaces: enforce-type-safety + enforce-null-safety ──
+    # ── Type check — compiler-level catches ─────────────────────────────────
     typecheck:
       run: npx tsc --noEmit
-      fail_text: "❌ TypeScript errors found. Fix before committing."
+      fail_text: "❌ TypeScript errors. Fix before committing."
 
-# pre-push hooks disabled until tests are implemented
-# pre-push:
-#   commands:
-#     # ── Replaces: testing/enforce-coverage-threshold ──
-#     test:
-#       run: npx vitest run --coverage
-#       fail_text: "❌ Tests failed or coverage below threshold."
+pre-push:
+  commands:
+
+    # ── Tests + coverage threshold ───────────────────────────────────────────
+    # Threshold is configured in vitest.config.ts (see below), not here.
+    # This hook is the gate — vitest enforces the actual numbers.
+    test:
+      run: npx vitest run --coverage
+      fail_text: "❌ Tests failed or coverage below threshold."
+
+    # ── Dead code detection ──────────────────────────────────────────────────
+    # Finds unused exports, unresolved imports, unused dependencies.
+    # Prevents AI-generated dead code from accumulating silently over months.
+    knip:
+      run: npx knip --production
+      fail_text: "❌ Dead exports or unused dependencies found. Clean up before pushing."
+
+# =============================================================================
+# vitest.config.ts coverage thresholds (add to your vitest config):
+#
+# coverage: {
+#   provider: "v8",
+#   thresholds: {
+#     lines: 80,
+#     functions: 80,
+#     branches: 70,
+#     statements: 80,
+#   },
+# }
+# =============================================================================

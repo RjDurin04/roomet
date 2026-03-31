@@ -6,8 +6,6 @@
 /** Default timeout for file upload requests (30s) */
 export const UPLOAD_TIMEOUT_MS = 30_000;
 
-/** Default timeout for external API calls (10s) */
-export const API_TIMEOUT_MS = 10_000;
 
 /**
  * Fetch with an AbortController-based timeout.
@@ -56,7 +54,7 @@ export async function parseUploadResponse(
     throw new Error(`Upload response for "${fileName}" was not valid JSON`);
   }
 
-  const storageId = (json as Record<string, unknown>)?.storageId;
+  const storageId = (json as Record<string, unknown>)['storageId'];
   if (typeof storageId !== 'string') {
     throw new Error(`Upload response missing storageId for "${fileName}"`);
   }
