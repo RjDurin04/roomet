@@ -6,6 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+lint_*.txt
+test_results*.txt
 
 # Dependencies
 node_modules
