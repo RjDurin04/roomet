@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import type { Doc } from "./_generated/dataModel";
+import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { authComponent } from "./auth";
 
@@ -25,7 +25,7 @@ export const create = mutation({
     const user = await requireUser(ctx);
     
     // Validate property exists
-    const property = await ctx.db.get(args.propertyId);
+    const property = (await ctx.db.get(args.propertyId)) as any;
     if (!property) throw new Error("Property not found");
 
     if (user.role === "owner" && property.ownerId === user._id) {
@@ -187,7 +187,7 @@ export const getMessages = query({
     // RES-H05: Paginate to latest 200 messages (over-fetch for cutoff filtering)
     const msgs = await ctx.db
       .query("messages")
-      .withIndex("by_conversation", q => q.eq("conversationId", args.conversationId))
+      .withIndex("by_conversation", (q: any) => q.eq("conversationId", args.conversationId))
       .order("desc")
       .take(200);
 

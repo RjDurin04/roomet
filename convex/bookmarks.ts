@@ -98,7 +98,7 @@ export const getUserBookmarks = query({
     // Map properties for UI
     const properties = await Promise.all(
       bookmarks.map(async (bk: any) => {
-        const p = await ctx.db.get(bk.propertyId);
+        const p = (await ctx.db.get(bk.propertyId)) as any;
         if (!p || p.status === "Deleted" || p.isVisible === false) return null;
 
         // Fetch image URLs
