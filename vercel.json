@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/auth/:path*",
-      "destination": "https://warmhearted-hyena-456.convex.site/api/auth/:path*"
+      "destination": "https://tremendous-donkey-641.convex.site/api/auth/:path*"
     }
   ]
 }
