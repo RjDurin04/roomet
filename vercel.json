@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/auth/:path*",
+      "destination": "https://warmhearted-hyena-456.convex.site/api/auth/:path*"
+    }
+  ]
+}
