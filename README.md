@@ -1,6 +1,6 @@
 # 🏠 Roomet
 
-> A boarding house discovery and management platform for tenants and property owners in the Cebu area.
+> A boarding house discovery and management platform for tenants and property owners.
 
 [![Deployed on Vercel](https://img.shields.io/badge/Live-roomet.vercel.app-000000?logo=vercel&logoColor=white)](https://roomet.vercel.app)
 
