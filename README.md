@@ -18,7 +18,7 @@ Owners get a dedicated dashboard to manage their listings, respond to inquiries,
 
 ### 🔍 Tenants (Viewers)
 
-- **Explore** boarding houses on an interactive map centered on Cebu
+- **Explore** boarding houses on an interactive map
 - **Filter** by price, amenities, gender restrictions, and room type
 - **View** detailed property pages with photos, room breakdowns, rules, and visiting schedules
 - **Bookmark** properties to revisit later
